@@ -436,9 +436,10 @@ class HTMLParser(object):
         source = self.read_url(self.link)
         if source.code != 200:
             Log.warn("Broken link? Non-200 status code: {}".format(source.code))
-        mimetype = source.info().get_content_type()
-        if mimetype != "text/html":
-            Log.fatal("Unsupported non-HTML content, got {}".format(mimetype))
+        if hasattr(source.info(), "gettype"):
+            mimetype = source.info().gettype()
+            if mimetype != "text/html":
+                Log.fatal("Unsupported non-HTML content, got {}".format(mimetype))
         self.source = source.read()
         if not self.no_cache:
             ok, status = Cache.write_link(self.link, self.source)
