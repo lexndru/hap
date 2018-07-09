@@ -1,4 +1,5 @@
 # Hap!
+[![Build Status](https://travis-ci.org/lexndru/hap.svg?branch=master)](https://travis-ci.org/lexndru/hap)
 
 Hap! is an HTML parser and scraping tool written in Python.
 
