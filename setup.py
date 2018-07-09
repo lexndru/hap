@@ -26,7 +26,7 @@ setup(name="hap",
     author_email="alex@codeissues.net",
     license="MIT",
     url="https://github.com/lexndru/hap",
-    download_url="https://github.com/lexndru/hap/archive/v0.1.0.tar.gz",
+    download_url="https://github.com/lexndru/hap/archive/v0.1.1.tar.gz",
     keywords=["html", "scraping", "crawler", "tool", "hap"],
     classifiers=[
         "Development Status :: 4 - Beta",
