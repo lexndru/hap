@@ -1,0 +1,26 @@
+{
+    "config": {
+        "headers": {
+            "User-Agent": "Hap/0.1.0 (Linux x86_64)"
+        }
+    },
+    "declare": {
+        "github": "string"
+    },
+    "define": [
+        {
+            "github": [
+                {
+                    "follow_xpath": "//*/a[@title='Skyle GitHub']/@href"
+                }
+            ]
+        }
+    ],
+    "link": "http://skyle.codeissues.net/",
+    "records": [
+        {
+            "_datetime": "2018-07-08 20:18:57.680988",
+            "github": "https://github.com/lexndru/skyle"
+        }
+    ]
+}
