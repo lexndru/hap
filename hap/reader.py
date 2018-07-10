@@ -47,4 +47,7 @@ class FileReader(object):
         """Returns parsed JSON content.
         """
 
-        return loads(data)
+        try:
+            return loads(data)
+        except:
+            return None

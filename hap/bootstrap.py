@@ -51,16 +51,30 @@ def main():
         print("")
         return
 
-    # Read input
-    if Shell.input is not None:
-        fr = FileReader(Shell.input)
-        ok, data_in = fr.read()
-        if not ok:
-            if sys.stdin.isatty():
-                return Log.error("Cannot read input because: {}".format(data_in))
-            data_in = FileReader.parse_json(sys.stdin.read())
-    else:
-        return Shell.psr.print_help()
+    # Input reader
+    def read_json():
+        if not sys.stdin.isatty():
+            data = sys.stdin.read()
+            if len(data) == 0 or not data:
+                return False, "Invalid input stream"
+            retval = FileReader.parse_json(data)
+            if retval is not None:
+                return True, retval
+        elif sys.stdin.isatty() and Shell.input is None:
+            Shell.psr.print_help()
+            return False, None
+        elif Shell.input is not None:
+            fr = FileReader(Shell.input)
+            ok, data = fr.read()
+            if not ok:
+                return False, data
+            return True, data
+        return False, "Input stream is not a valid JSON"
+
+    # Read data
+    status, data_in = read_json()
+    if not status:
+        raise SystemExit(data_in)
 
     # Log shell params
     if Shell.verbose and not Shell.silent:
