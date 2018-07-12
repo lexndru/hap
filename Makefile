@@ -12,3 +12,8 @@ build:
 
 clean:
 	find . -regextype posix-extended -regex ".*.pyc" -type f -delete
+	rm -rf /tmp/$(SRCDIR)
+
+release: build
+	cd /tmp/$(SRCDIR)/hap && python setup.py sdist
+	ls -l

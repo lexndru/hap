@@ -25,6 +25,8 @@ from __future__ import print_function
 import sys
 import uuid
 
+from hap.version import __version__ as ver
+
 from hap.log import Log
 from hap.shell import Shell
 from hap.reader import FileReader
@@ -39,6 +41,10 @@ def main():
 
     # Parse shell arguments
     Shell.parse()
+
+    # Print version
+    if Shell.version:
+        return print("Hap! v{}".format(ver))
 
     # Log config
     Log.configure(not Shell.silent and Shell.verbose)

@@ -46,6 +46,7 @@ class Shell(object):
         cls.psr.add_argument("--no-cache", help="disable cache link", action="store_true")
         cls.psr.add_argument("--refresh", help="reset stored records", action="store_true")
         cls.psr.add_argument("--silent", help="suppress any output", action="store_true")
+        cls.psr.add_argument("--version", help="print version number", action="store_true")
         cls.psr.add_argument("input", help="your JSON formated dataplan input", nargs="?")
         args = cls.psr.parse_args()
 

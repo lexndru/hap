@@ -433,8 +433,11 @@ class HTMLParser(object):
         it return a non-HTML content-type, a fatal log is set.
         """
 
-        source = self.read_url(self.link)
-        if source.code != 200:
+        status, source = self.read_url(self.link)
+        if not status:
+            Log.fatal("Cannot reach link: {}".format(source))
+            return self
+        if status and source.code != 200:
             Log.warn("Broken link? Non-200 status code: {}".format(source.code))
         if hasattr(source.info(), "gettype"):
             mimetype = source.info().gettype()
@@ -454,10 +457,13 @@ class HTMLParser(object):
             url (str): URL to access.
 
         Returns:
-            resource: HTTP stream resource.
+            tuple: Boolean status and HTTP stream resource or error.
         """
 
-        return urlopen(self.decorate_headers(url))
+        try:
+            return True, urlopen(self.decorate_headers(url))
+        except Exception as e:
+            return False, str(e)
 
     def decorate_headers(self, link):
         """Add headers to request.

@@ -8,7 +8,7 @@ The purpose of Hap! is to have a simple and fast way to retrieve certain data fr
 ## Usage
 ```
 usage: hap [-h] [--sample] [--link LINK] [--save] [--verbose] [--no-cache]
-           [--refresh] [--silent]
+           [--refresh] [--silent] [--version]
            [input]
 
 Hap! Simple HTML scraping tool
@@ -25,6 +25,7 @@ optional arguments:
   --no-cache   disable cache link
   --refresh    reset stored records
   --silent     suppress any output
+  --version    print version number
 ```
 
 ## An educational example
@@ -143,6 +144,7 @@ $ fancy_process | hap --verbose
 ```
 The `--verbose` flag is the reason the detailed output above exists. If the flag would have been omitted, only the JSON at the bottom would have been printed.
 
+Note: scripts can capture verbose output and errors from stderr; and output results from stdout or by saving to file.
 
 ## How to install
 - Install python package `hap`.
