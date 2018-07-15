@@ -11,7 +11,7 @@
         {
             "github": [
                 {
-                    "follow_xpath": "//*/a[@title='Skyle GitHub']/@href"
+                    "query_xpath": "//*/a[@title='Skyle GitHub']/@href"
                 }
             ]
         }

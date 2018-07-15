@@ -69,17 +69,17 @@ Defined entries must be found in the declaration object above otherwise it will 
     "define": [
         {
             "product_name": {
-                "follow": ".products > [data-product-id] > h1"
+                "query": ".products > [data-product-id] > h1"
             }
         },
         {
             "product_price": {
-                "follow_xpath": "//*/div[@class='products']/div/span[@class='price']/text()"
+                "query_xpath": "//*/div[@class='products']/div/span[@class='price']/text()"
             }
         },
         {
             "product_currency": {
-                "follow": ".products > [data-product-id] > span > em"
+                "query": ".products > [data-product-id] > span > em"
             }
         }
     ]
@@ -98,17 +98,17 @@ The final touch is to add a link of the internet page of the product. Let's pret
     "define": [
         {
             "product_name": {
-                "follow": ".products > [data-product-id] > h1"
+                "query": ".products > [data-product-id] > h1"
             }
         },
         {
             "product_price": {
-                "follow_xpath": "//*/div[@class='products']/div/span[@class='price']/text()"
+                "query_xpath": "//*/div[@class='products']/div/span[@class='price']/text()"
             }
         },
         {
             "product_currency": {
-                "follow": ".products > [data-product-id] > span > em"
+                "query": ".products > [data-product-id] > span > em"
             }
         }
     ]
@@ -125,11 +125,11 @@ $ fancy_process | hap --verbose
 2018-07-09 01:21:28,436 HTML Parser initialized
 2018-07-09 01:21:28,447 Getting content from cache: http://localhost/cool-store/product/900
 2018-07-09 01:21:28,473 Parsing definition for 'product_name'
-2018-07-09 01:21:28,486 Performing product_name:follow '.products > [data-product-id] > h1' => Cool product
+2018-07-09 01:21:28,486 Performing product_name:query '.products > [data-product-id] > h1' => Cool product
 2018-07-09 01:21:28,486 Parsing definition for 'product_price'
-2018-07-09 01:21:28,489 Performing product_price:follow '//*/div[@class='products']/div/span[@class='price']/text()' => 10.99
+2018-07-09 01:21:28,489 Performing product_price:query '//*/div[@class='products']/div/span[@class='price']/text()' => 10.99
 2018-07-09 01:21:28,522 Parsing definition for 'product_currency'
-2018-07-09 01:21:28,523 Performing product_currency:follow '.products > [data-product-id] > span > em' => Eur
+2018-07-09 01:21:28,523 Performing product_currency:query '.products > [data-product-id] > span > em' => Eur
 2018-07-09 01:21:28,523 Updating records with 'product_name' as 'Cool product' (string)
 2018-07-09 01:21:28,523 Updating records with 'product_price' as '10.99' (decimal)
 2018-07-09 01:21:28,523 Updating records with 'product_currency' as 'Eur' (string)
@@ -174,14 +174,14 @@ Note: scripts can capture verbose output and errors from stderr; and output resu
         {
             "github": [
                 {
-                    "follow_xpath": "//*/a[@title='Skyle GitHub']/@href"
+                    "query_xpath": "//*/a[@title='Skyle GitHub']/@href"
                 }
             ]
         }
     ]
 }
 ```
-- Run `cat test.json | hap`.
+- Run `hap test.json --verbose --no-cache`.
 
 
 ## License

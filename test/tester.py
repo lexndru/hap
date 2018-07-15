@@ -62,7 +62,7 @@ def main():
             {
                 "github": [
                     {
-                        "follow_xpath": "//*/a[@title='Hap GitHub']/@href"
+                        "query_xpath": "//*/a[@title='Hap GitHub']/@href"
                     }
                 ]
             }

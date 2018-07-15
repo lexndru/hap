@@ -219,12 +219,12 @@ class HTMLParser(object):
                 return True, var
         return False, string
 
-    def perform(self, follow=None, follow_xpath=None, pattern=None, remove=None, glue=None, replace=None):
+    def perform(self, query=None, query_xpath=None, pattern=None, remove=None, glue=None, replace=None):
         """Perfomer dispatcher.
 
         Args:
-            follow       (str): CSS selector to follow.
-            follow_xpath (str): XPath expression to follow.
+            query        (str): CSS selector to query.
+            query_xpath  (str): XPath expression to query.
             pattern      (str): RegEx pattern to evaluate (extract).
             remove       (str): RegEx pattern to evaluate (removal).
             glue        (list): Concatenate list's values.
@@ -234,12 +234,12 @@ class HTMLParser(object):
             mixt: Last evaluated results.
         """
 
-        if follow is not None:
-            self.last_result = self.perform_follow(follow)
-            Log.debug(u"Performing {}:follow '{}' => {}".format(self.def_key, follow, self.last_result))
-        elif follow_xpath is not None:
-            self.last_result = self.perform_follow(follow_xpath, xpath=True)
-            Log.debug(u"Performing {}:follow:xpath '{}' => {}".format(self.def_key, follow_xpath, self.last_result))
+        if query is not None:
+            self.last_result = self.perform_query(query)
+            Log.debug(u"Performing {}:query:css '{}' => {}".format(self.def_key, query, self.last_result))
+        elif query_xpath is not None:
+            self.last_result = self.perform_query(query_xpath, xpath=True)
+            Log.debug(u"Performing {}:query:xpath '{}' => {}".format(self.def_key, query_xpath, self.last_result))
         elif pattern is not None:
             self.last_result = self.perform_pattern(pattern)
             Log.debug(u"Performing {}:pattern '{}' => {}".format(self.def_key, pattern, self.last_result))
@@ -254,24 +254,24 @@ class HTMLParser(object):
             Log.debug(u"Performing {}:replace '{}' => {}".format(self.def_key, replace, self.last_result))
         return self.last_result
 
-    def perform_follow(self, follow, xpath=False):
+    def perform_query(self, query, xpath=False):
         """Evaluate a CSS selector or a XPath expression.
 
         Args:
-            follow (str): CSS selector or XPath expression.
-            xpath (bool): True if follow is an expression.
+            query  (str): CSS selector or XPath expression.
+            xpath (bool): True if query is an expression.
 
         Returns:
             mixt: String if data is found, otherwise None or empty.
         """
 
         if xpath:
-            data = self.source_code.xpath(follow)
+            data = self.source_code.xpath(query)
             if isinstance(data, list):
                 data = [d for d in data if not d.isspace()]
             last_result = lambda data: data.strip()
         else:
-            data = self.source_code.cssselect(follow)
+            data = self.source_code.cssselect(query)
             def last_result(data):
                 if isinstance(data, html.HtmlElement):
                     return data.text_content().strip()
