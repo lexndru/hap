@@ -197,6 +197,8 @@ class HTMLParser(object):
         if isinstance(value, (str, unicode)):
             self.last_result = value
             Log.debug(u"Performing {}:assignment => {}".format(self.def_key, self.last_result))
+        elif isinstance(value, dict):
+            self.last_result = self.perform(**value)
         elif isinstance(value, list):
             actions = [self.perform(**i) for i in value if isinstance(i, dict)]
             if len(actions) > 0:

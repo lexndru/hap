@@ -89,7 +89,11 @@ def main():
 
     # Update link?
     if Shell.link is not None:
-        data_in["link"] = unicode(Shell.link)
+        data_in.update({"link": unicode(Shell.link)})
+
+    # Crash if no link is provided
+    if data_in.get("link", "") == "":
+        raise SystemExit("No link provided. See --help")
 
     # Parse document
     psr = HTMLParser(data_in, no_cache=Shell.no_cache, refresh=(Shell.save and Shell.refresh))
