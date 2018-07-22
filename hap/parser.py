@@ -82,13 +82,13 @@ class HTMLParser(object):
             key_exists = self.dataplan.has_key(section)
             if not key_exists:
                 if required:
-                    Log.fatal("Missing required section: '{}'".format(section))
+                    Log.fatal(u"Missing required section: '{}'".format(section))
                 else:
                     continue
             if key_exists and not isinstance(data, datatype):
-                Log.fatal("Wrong type: section '{}' must be {}".format(section, datatype))
+                Log.fatal(u"Wrong type: section '{}' must be {}".format(section, datatype))
             if not hasattr(self, "prepare_{}".format(section)):
-                Log.fatal("Unsupported section '{}'".format(section))
+                Log.fatal(u"Unsupported section '{}'".format(section))
             getattr(self, "prepare_{}".format(section))(data)
 
         Log.debug("Logging records datetime...")
@@ -133,16 +133,16 @@ class HTMLParser(object):
 
         for key, datatype in declarations.iteritems():
             if not self.data.has_key(key):
-                Log.warn("No data found for key '{}'".format(key))
+                Log.warn(u"No data found for key '{}'".format(key))
             value = self.data.get(key)
             convert_func = Field.DATA_TYPES.get(datatype)
             if value is not None and callable(convert_func):
                 try:
                     value = convert_func(value)
                 except Exception as e:
-                    Log.warn("Cannot convert value because {}".format(e))
+                    Log.warn(u"Cannot convert value because {}".format(e))
             self.records.update({key:value})
-            Log.debug("Updating records with '{}' as '{}' ({})".format(key, value, datatype))
+            Log.debug(u"Updating records with '{}' as '{}' ({})".format(key, value, datatype))
 
     def prepare_define(self, definitions):
         """The "define" protocol.
@@ -166,11 +166,11 @@ class HTMLParser(object):
 
         try:
             self.def_key, val = entry.items().pop()
-            Log.debug("Parsing definition for '{}'".format(self.def_key))
+            Log.debug(u"Parsing definition for '{}'".format(self.def_key))
             key_value = self.eval_def_value(val)
             self.keep_first_non_empty(self.def_key, key_value)
         except Exception as e:
-            Log.error("Cannot parse definitions: {}".format(e))
+            Log.error(u"Cannot parse definitions: {}".format(e))
 
     def keep_first_non_empty(self, key, value):
         """A "define" protocol helper.
@@ -402,9 +402,9 @@ class HTMLParser(object):
         self.link = link
         ok, cache = Cache.read_link(self.link)
         if not self.no_cache and ok:
-            Log.debug("Getting content from cache: {}".format(link))
+            Log.debug(u"Getting content from cache: {}".format(link))
             return self.prepare_source_code_from_cache(cache)
-        Log.debug("Getting content from URL: {}".format(link))
+        Log.debug(u"Getting content from URL: {}".format(link))
         return self.open_url().prepare_source_code()
 
     def prepare_source_code_from_cache(self, cache_src):
@@ -437,14 +437,14 @@ class HTMLParser(object):
 
         status, source = self.read_url(self.link)
         if not status:
-            Log.fatal("Cannot reach link: {}".format(source))
+            Log.fatal(u"Cannot reach link: {}".format(source))
             return self
         if status and source.code != 200:
-            Log.warn("Broken link? Non-200 status code: {}".format(source.code))
+            Log.warn(u"Broken link? Non-200 status code: {}".format(source.code))
         if hasattr(source.info(), "gettype"):
             mimetype = source.info().gettype()
             if mimetype != "text/html":
-                Log.fatal("Unsupported non-HTML content, got {}".format(mimetype))
+                Log.fatal(u"Unsupported non-HTML content, got {}".format(mimetype))
         self.source = source.read()
         if not self.no_cache:
             ok, status = Cache.write_link(self.link, self.source)
@@ -478,7 +478,7 @@ class HTMLParser(object):
         """
 
         if self.headers:
-            Log.debug("Setting outgoing HTTP headers to: {}".format(self.headers))
+            Log.debug(u"Setting outgoing HTTP headers to: {}".format(self.headers))
             return Request(link, headers=self.headers)
         return Request(link)
 

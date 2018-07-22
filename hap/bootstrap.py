@@ -84,8 +84,8 @@ def main():
 
     # Log shell params
     if Shell.verbose and not Shell.silent:
-        Log.info("Filepath: {}".format(Shell.input))
-        Log.info("Save to file? {}".format(Shell.save))
+        Log.info(u"Filepath: {}".format(Shell.input))
+        Log.info(u"Save to file? {}".format(Shell.save))
 
     # Update link?
     if Shell.link is not None:
