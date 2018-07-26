@@ -70,8 +70,8 @@ class HTMLParser(object):
         """
 
         records = self.dataplan.get(Field.RECORDS)
-        n_data = len(records)
-        if isinstance(records, list) and n_data > 0:
+        if isinstance(records, list) and len(records) > 0:
+            n_data = len(records)
             Log.debug("Found {} stored record(s) in dataplan".format(n_data))
 
         if self.refresh_records and Field.RECORDS in self.dataplan:
