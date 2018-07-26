@@ -32,7 +32,7 @@ from hap.shell import Shell
 from hap.reader import FileReader
 from hap.writer import FileWriter
 from hap.parser import HTMLParser
-from hap.util import print_json
+from hap.util import print_json, SAMPLES_MESSAGE
 
 
 def main():
@@ -51,11 +51,7 @@ def main():
 
     # Dump info and exit
     if Shell.sample:
-        print("")
-        print("  Hap! A simple HTML parser and scraping tool")
-        print("  Visit https://github.com/lexndru/hap for documentation and samples")
-        print("")
-        return
+        return print(SAMPLES_MESSAGE)
 
     # Input reader
     def read_json():
@@ -96,7 +92,8 @@ def main():
         raise SystemExit("No link provided. See --help")
 
     # Parse document
-    psr = HTMLParser(data_in, no_cache=Shell.no_cache, refresh=(Shell.save and Shell.refresh))
+    psr = HTMLParser(data_in, no_cache=Shell.no_cache,
+                     refresh=(Shell.save and Shell.refresh))
     psr.run()
     records = psr.get_records()
     dataplan = psr.get_dataplan()

@@ -26,6 +26,12 @@ from json import dumps, JSONEncoder
 from decimal import Decimal
 
 
+SAMPLES_MESSAGE = """
+  Hap! A simple HTML parser and scraping tool
+  Visit https://github.com/lexndru/hap for documentation and samples
+"""
+
+
 class DecimalEncoder(JSONEncoder):
     """Helper class used for JSON dumps.
 

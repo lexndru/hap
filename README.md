@@ -163,7 +163,7 @@ Note: scripts can capture verbose output and errors from stderr; and output resu
 {
     "config": {
         "headers": {
-            "User-Agent": "Hap/1.0.4 (Linux x86_64)"
+            "User-Agent": "Hap/1.0.5 (Linux x86_64)"
         }
     },
     "link": "http://skyle.codeissues.net/",

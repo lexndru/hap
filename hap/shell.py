@@ -39,15 +39,33 @@ class Shell(object):
             raise Exception("Shell already parsed")
 
         cls.psr = ArgumentParser(description="Hap! Simple HTML scraping tool")
-        cls.psr.add_argument("--sample", help="generate a sample dataplan", action="store_true")
-        cls.psr.add_argument("--link", help="overwrite link in dataplan", action="store")
-        cls.psr.add_argument("--save", help="save collected data to dataplan", action="store_true")
-        cls.psr.add_argument("--verbose", help="enable verbose mode", action="store_true")
-        cls.psr.add_argument("--no-cache", help="disable cache link", action="store_true")
-        cls.psr.add_argument("--refresh", help="reset stored records", action="store_true")
-        cls.psr.add_argument("--silent", help="suppress any output", action="store_true")
-        cls.psr.add_argument("--version", help="print version number", action="store_true")
-        cls.psr.add_argument("input", help="your JSON formated dataplan input", nargs="?")
+        cls.psr.add_argument("--sample",
+                             help="generate a sample dataplan",
+                             action="store_true")
+        cls.psr.add_argument("--link",
+                             help="overwrite link in dataplan",
+                             action="store")
+        cls.psr.add_argument("--save",
+                             help="save collected data to dataplan",
+                             action="store_true")
+        cls.psr.add_argument("--verbose",
+                             help="enable verbose mode",
+                             action="store_true")
+        cls.psr.add_argument("--no-cache",
+                             help="disable cache link",
+                             action="store_true")
+        cls.psr.add_argument("--refresh",
+                             help="reset stored records",
+                             action="store_true")
+        cls.psr.add_argument("--silent",
+                             help="suppress any output",
+                             action="store_true")
+        cls.psr.add_argument("--version",
+                             help="print version number",
+                             action="store_true")
+        cls.psr.add_argument("input",
+                             help="your JSON formated dataplan input",
+                             nargs="?")
         args = cls.psr.parse_args()
 
         for prop in dir(args):

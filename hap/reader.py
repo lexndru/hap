@@ -49,5 +49,5 @@ class FileReader(object):
 
         try:
             return loads(data)
-        except:
+        except Exception:
             return None

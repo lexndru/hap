@@ -1,9 +1,9 @@
 CWD=$(shell pwd)
 SRCDIR=hap
 
-.PHONY: all clean build
+.PHONY: all clean build lint
 
-all: clean build
+all: clean lint build
 
 build:
 	cd /tmp && virtualenv $(SRCDIR) && cd $(SRCDIR)
@@ -17,3 +17,6 @@ clean:
 release: build
 	cd /tmp/$(SRCDIR)/hap && python setup.py sdist
 	ls -l
+
+lint:
+	flake8 $(SRCDIR)

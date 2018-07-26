@@ -87,7 +87,7 @@ class Cache(object):
             tuple: Boolean for success read and string for size or error.
         """
 
-        if len(cache) == 0:
+        if len(cache_path) == 0:
             return False, "missing cache path"
         if len(cache) == 0:
             return False, "missing cache data"

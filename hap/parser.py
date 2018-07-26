@@ -70,26 +70,28 @@ class HTMLParser(object):
         """
 
         records = self.dataplan.get(Field.RECORDS)
-        if isinstance(records, list) and len(records) > 0:
-            Log.debug("Found {} stored record(s) in dataplan".format(len(records)))
+        n_data = len(records)
+        if isinstance(records, list) and n_data > 0:
+            Log.debug("Found {} stored record(s) in dataplan".format(n_data))
 
-        if self.refresh_records and self.dataplan.has_key(Field.RECORDS):
+        if self.refresh_records and Field.RECORDS in self.dataplan:
             del self.dataplan[Field.RECORDS]
             Log.debug("Cleaning stored records in dataplan...")
 
-        for section, required, datatype in self.sections:
-            data = self.dataplan.get(section)
-            key_exists = self.dataplan.has_key(section)
+        for sec, required, datatype in self.sections:
+            data = self.dataplan.get(sec)
+            key_exists = sec in self.dataplan
             if not key_exists:
                 if required:
-                    Log.fatal(u"Missing required section: '{}'".format(section))
+                    Log.fatal(u"Missing required section: '{}'".format(sec))
                 else:
                     continue
             if key_exists and not isinstance(data, datatype):
-                Log.fatal(u"Wrong type: section '{}' must be {}".format(section, datatype))
-            if not hasattr(self, "prepare_{}".format(section)):
-                Log.fatal(u"Unsupported section '{}'".format(section))
-            getattr(self, "prepare_{}".format(section))(data)
+                err = (sec, datatype)
+                Log.fatal(u"Wrong type: section '{}' must be {}".format(*err))
+            if not hasattr(self, "prepare_{}".format(sec)):
+                Log.fatal(u"Unsupported section '{}'".format(sec))
+            getattr(self, "prepare_{}".format(sec))(data)
 
         Log.debug("Logging records datetime...")
         self.records["_datetime"] = str(datetime.utcnow())
@@ -132,7 +134,7 @@ class HTMLParser(object):
         """
 
         for key, datatype in declarations.iteritems():
-            if not self.data.has_key(key):
+            if key not in self.data:
                 Log.warn(u"No data found for key '{}'".format(key))
             value = self.data.get(key)
             convert_func = Field.DATA_TYPES.get(datatype)
@@ -141,8 +143,9 @@ class HTMLParser(object):
                     value = convert_func(value)
                 except Exception as e:
                     Log.warn(u"Cannot convert value because {}".format(e))
-            self.records.update({key:value})
-            Log.debug(u"Updating records with '{}' as '{}' ({})".format(key, value, datatype))
+            self.records.update({key: value})
+            args = (key, value, datatype)
+            Log.debug(u"Updating records with '{}' as '{}' ({})".format(*args))
 
     def prepare_define(self, definitions):
         """The "define" protocol.
@@ -196,7 +199,8 @@ class HTMLParser(object):
         self.last_result = None
         if isinstance(value, (str, unicode)):
             self.last_result = value
-            Log.debug(u"Performing {}:assignment => {}".format(self.def_key, self.last_result))
+            key, result = self.def_key, self.last_result
+            Log.debug(u"Performing {}:assignment => {}".format(key, result))
         elif isinstance(value, dict):
             self.last_result = self.perform(**value)
         elif isinstance(value, list):
@@ -221,7 +225,8 @@ class HTMLParser(object):
                 return True, var
         return False, string
 
-    def perform(self, query=None, query_xpath=None, pattern=None, remove=None, glue=None, replace=None):
+    def perform(self, query=None, query_xpath=None, pattern=None,
+                remove=None, glue=None, replace=None):
         """Perfomer dispatcher.
 
         Args:
@@ -238,22 +243,28 @@ class HTMLParser(object):
 
         if query is not None:
             self.last_result = self.perform_query(query)
-            Log.debug(u"Performing {}:query:css '{}' => {}".format(self.def_key, query, self.last_result))
+            Log.debug(u"Performing {}:query:css '{}' => {}".format(
+                        self.def_key, query, self.last_result))
         elif query_xpath is not None:
             self.last_result = self.perform_query(query_xpath, xpath=True)
-            Log.debug(u"Performing {}:query:xpath '{}' => {}".format(self.def_key, query_xpath, self.last_result))
+            Log.debug(u"Performing {}:query:xpath '{}' => {}".format(
+                        self.def_key, query_xpath, self.last_result))
         elif pattern is not None:
             self.last_result = self.perform_pattern(pattern)
-            Log.debug(u"Performing {}:pattern '{}' => {}".format(self.def_key, pattern, self.last_result))
+            Log.debug(u"Performing {}:pattern '{}' => {}".format(
+                        self.def_key, pattern, self.last_result))
         elif remove is not None:
             self.last_result = self.perform_remove(remove)
-            Log.debug(u"Performing {}:remove '{}' => {}".format(self.def_key, remove, self.last_result))
+            Log.debug(u"Performing {}:remove '{}' => {}".format(
+                        self.def_key, remove, self.last_result))
         elif glue is not None:
             self.last_result = self.perform_glue(glue)
-            Log.debug(u"Performing {}:glue '{}' => {}".format(self.def_key, glue, self.last_result))
+            Log.debug(u"Performing {}:glue '{}' => {}".format(
+                        self.def_key, glue, self.last_result))
         elif replace is not None:
             self.last_result = self.perform_replace(*replace)
-            Log.debug(u"Performing {}:replace '{}' => {}".format(self.def_key, replace, self.last_result))
+            Log.debug(u"Performing {}:replace '{}' => {}".format(
+                        self.def_key, replace, self.last_result))
         return self.last_result
 
     def perform_query(self, query, xpath=False):
@@ -268,23 +279,24 @@ class HTMLParser(object):
         """
 
         if xpath:
+            def last_result(data):
+                return data.strip()
             data = self.source_code.xpath(query)
             if isinstance(data, list):
                 data = [d for d in data if not d.isspace()]
-            last_result = lambda data: data.strip()
         else:
-            data = self.source_code.cssselect(query)
             def last_result(data):
                 if isinstance(data, html.HtmlElement):
                     return data.text_content().strip()
                 return self.last_result
+            data = self.source_code.cssselect(query)
         try:
             if data is None:
                 return self.last_result
             if isinstance(data, list) and len(data) > 0:
                 data = data[0]
             return last_result(data)
-        except:
+        except Exception:
             return self.last_result
 
     def perform_pattern(self, pattern):
@@ -360,19 +372,21 @@ class HTMLParser(object):
 
         if not isinstance(self.last_result, (str, unicode)):
             return self.last_result
+
         def test_var(val):
             truth, var = self.is_variable(val)
             if truth and isinstance(var, (str, unicode)):
                 val = var
             return val
+
         old, new = test_var(old_replace), test_var(new_replace)
         return sub(old, new, self.last_result)
 
     def prepare_config(self, configuration):
         """The "config" protocol.
 
-        Configure requester with HTTP client-related options such as User-Agent,
-        Content-Type, and other HTTP headers.
+        Configure requester with HTTP client-related options such as
+        User-Agent, Content-Type, and other HTTP headers.
 
         Only HTTP headers are supported at the moment.
         """
@@ -384,8 +398,8 @@ class HTMLParser(object):
     def prepare_meta(self, metafields):
         """The "meta" protocol.
 
-        Meta fields are trated AS-IS and the only benefit of these fields is to
-        be have them printed when verbose mode is enabled.
+        Meta fields are trated AS-IS and the only benefit of these fields is
+        to be have them printed when verbose mode is enabled.
         """
 
         if len(metafields) > 0:
@@ -440,11 +454,11 @@ class HTMLParser(object):
             Log.fatal(u"Cannot reach link: {}".format(source))
             return self
         if status and source.code != 200:
-            Log.warn(u"Broken link? Non-200 status code: {}".format(source.code))
+            Log.warn(u"Non-200 status code: {}".format(source.code))
         if hasattr(source.info(), "gettype"):
             mimetype = source.info().gettype()
             if mimetype != "text/html":
-                Log.fatal(u"Unsupported non-HTML content, got {}".format(mimetype))
+                Log.fatal(u"Unsupported content, got {}".format(mimetype))
         self.source = source.read()
         if not self.no_cache:
             ok, status = Cache.write_link(self.link, self.source)
@@ -478,7 +492,7 @@ class HTMLParser(object):
         """
 
         if self.headers:
-            Log.debug(u"Setting outgoing HTTP headers to: {}".format(self.headers))
+            Log.debug(u"Outgoing HTTP headers: {}".format(self.headers))
             return Request(link, headers=self.headers)
         return Request(link)
 
@@ -503,8 +517,8 @@ class HTMLParser(object):
 
         Args:
             data     (dict): Parsed dataplan from JSON.
-            no_cache (bool): True if --no-cache is provided; disabled cache.
-            refresh  (bool): True if --refresh is provided; resets stored records.
+            no_cache (bool): Whether --no-cache disables cache.
+            refresh  (bool): Whether --refresh resets stored records.
 
         Returns:
             dict: Updated dataplan with records.
