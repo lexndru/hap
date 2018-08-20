@@ -231,12 +231,13 @@ class HTMLParser(object):
                 return True, var
         return False, string
 
-    def perform(self, query=None, query_xpath=None, pattern=None,
-                remove=None, glue=None, replace=None):
+    def perform(self, query=None, query_css=None, query_xpath=None,
+                pattern=None, remove=None, glue=None, replace=None):
         """Perfomer dispatcher.
 
         Args:
-            query        (str): CSS selector to query.
+            query        (str): Alias of query_css.
+            query_css    (str): CSS selector to query.
             query_xpath  (str): XPath expression to query.
             pattern      (str): RegEx pattern to evaluate (extract).
             remove       (str): RegEx pattern to evaluate (removal).
@@ -248,9 +249,11 @@ class HTMLParser(object):
         """
 
         if query is not None:
-            self.last_result = self.perform_query(query)
+            query_css = query
+        if query_css is not None:
+            self.last_result = self.perform_query(query_css)
             Log.debug(u"Performing {}:query:css '{}' => {}".format(
-                        self.def_key, query, self.last_result))
+                        self.def_key, query_css, self.last_result))
         elif query_xpath is not None:
             self.last_result = self.perform_query(query_xpath, xpath=True)
             Log.debug(u"Performing {}:query:xpath '{}' => {}".format(

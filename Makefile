@@ -1,11 +1,11 @@
 CWD=$(shell pwd)
-SRCDIR=hap
+SRC_DIR=hap
 
-.PHONY: all clean build lint
+.PHONY: all clean build lint tests
 
-all: clean lint build
+all: clean lint tests build
 
-build:
+build: lint tests
 	cd /tmp && virtualenv $(SRC_DIR) && cd $(SRC_DIR)
 	cp -R $(CWD) /tmp/$(SRC_DIR)
 	ls -l

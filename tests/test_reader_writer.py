@@ -20,5 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from os import remove
+from unittest import TestCase
 
-__version__ = "1.2.0"
+from hap.reader import FileReader
+from hap.writer import FileWriter
+
+
+class TestReaderWriter(TestCase):
+
+    def test_read_write(self):
+        data = {"hap": "lorem ipsum", "test": True}
+        with self.assertRaises(Exception) as context:
+            FileWriter(None)
+            self.assertTrue("Filepath must be string" in context.exception)
+        fw = FileWriter("/tmp/.hap.tmp")
+        ok, error = fw.write(data)
+        self.assertTrue(ok)
+        with self.assertRaises(Exception) as context:
+            FileReader(None)
+            self.assertTrue("Filepath must be string" in context.exception)
+        fr = FileReader("/tmp/.hap.tmp")
+        ok, content = fr.read()
+        self.assertTrue(ok)
+        self.assertEqual(content, data)
+        remove("/tmp/.hap.tmp")

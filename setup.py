@@ -20,6 +20,7 @@ setup(name="hap",
             "hap = hap.bootstrap:main"
         ]
     },
+    test_suite="tests",
     install_requires=[
         "lxml==3.6.4",
         "cssselect==1.0.0",
