@@ -12,3 +12,4 @@ install:
 script:
   - python test.py
   - python hap.py samples/sample.json --verbose --no-cache
+  - python hap.py samples/pattern.json --verbose --no-cache

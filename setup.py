@@ -2,6 +2,8 @@
 
 from setuptools import setup
 
+from hap import __version__
+
 
 long_description = """
 Hap! is an HTML parser and scraping tool written in Python.
@@ -22,14 +24,14 @@ setup(name="hap",
         "lxml==3.6.4",
         "cssselect==1.0.0",
     ],
-    version="1.0.5",
+    version=__version__,
     description="A simple HTML scraping tool",
     long_description=long_description,
     author="Alexandru Catrina",
     author_email="alex@codeissues.net",
     license="MIT",
     url="https://github.com/lexndru/hap",
-    download_url="https://github.com/lexndru/hap/archive/v1.0.5.tar.gz",
+    download_url="https://github.com/lexndru/hap/archive/v{}.tar.gz".format(__version__),
     keywords=["html", "scraping", "crawler", "tool", "hap"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
