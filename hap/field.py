@@ -28,6 +28,7 @@ class Field(object):
     """
 
     RECORDS, META, CONFIG, HEADERS = r"records", r"meta", r"config", r"headers"
+    PAYLOAD, PROXIES = r"payload", r"proxies"
 
     LINK, DECLARE, DEFINE = r"link", r"declare", r"define"
 

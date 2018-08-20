@@ -55,7 +55,7 @@ class Shell(object):
                              help="disable cache link",
                              action="store_true")
         cls.psr.add_argument("--refresh",
-                             help="reset stored records",
+                             help="reset stored records before save",
                              action="store_true")
         cls.psr.add_argument("--silent",
                              help="suppress any output",

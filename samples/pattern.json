@@ -1,0 +1,50 @@
+{
+    "config": {
+        "headers": {
+            "User-Agent": "Hap/1.0.5 (Linux x86_64)"
+        },
+        "request": {
+            "payload": "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
+        }
+    },
+    "declare": {
+        "clone": "string",
+        "github": "string",
+        "project": "string",
+        "username": "string"
+    },
+    "define": [
+        {
+            "github": [
+                {
+                    "query_xpath": "//*/a[@title='Skyle GitHub']/@href"
+                },
+                {
+                    "pattern": "https?://.+/((?P<username>.+)/(?P<project>.+))"
+                }
+            ]
+        },
+        {
+            "clone": {
+                "glue": [
+                    "git clone git@github.com",
+                    ":",
+                    ":username",
+                    "/",
+                    ":project",
+                    ".git"
+                ]
+            }
+        }
+    ],
+    "link": "http://skyle.codeissues.net/",
+    "records": [
+        {
+            "_datetime": "2018-08-19 23:58:19.904562",
+            "clone": "git clone git@github.com:lexndru/skyle.git",
+            "github": "lexndru/skyle",
+            "project": "skyle",
+            "username": "lexndru"
+        }
+    ]
+}

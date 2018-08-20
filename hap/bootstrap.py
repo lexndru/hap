@@ -25,7 +25,7 @@ from __future__ import print_function
 import sys
 import uuid
 
-from hap.version import __version__ as ver
+from hap import __version__
 
 from hap.log import Log
 from hap.shell import Shell
@@ -44,7 +44,7 @@ def main():
 
     # Print version
     if Shell.version:
-        return print("Hap! v{}".format(ver))
+        return print("Hap! v{}".format(__version__))
 
     # Log config
     Log.configure(not Shell.silent and Shell.verbose)

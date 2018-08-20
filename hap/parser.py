@@ -37,10 +37,12 @@ class HTMLParser(object):
     are defined by a JSON-like schema.
     """
 
-    source, source_code, link, headers = None, None, None, dict()
+    source, source_code, link = None, None, None
     variable, def_key, last_result = r":", None, None
     data, records = dict(), dict()
     refresh_records, no_cache = False, False
+    headers, payload, proxies = dict(), None, None
+    supported_mime_types = ("text/html", "text/xml")
 
     sections = (
         # field,      required, type
@@ -167,6 +169,10 @@ class HTMLParser(object):
         Parse each defined entry and choose it's correct action to apply.
         """
 
+        if len(entry) != 1:
+            warning_msg = "Incorrect definition entry: expected one key, " \
+                          "got {n} ..."
+            Log.warn(warning_msg.format(n=len(entry)))
         try:
             self.def_key, val = entry.items().pop()
             Log.debug(u"Parsing definition for '{}'".format(self.def_key))
@@ -290,9 +296,9 @@ class HTMLParser(object):
                     return data.text_content().strip()
                 return self.last_result
             data = self.source_code.cssselect(query)
+        if data is None:
+            return self.last_result
         try:
-            if data is None:
-                return self.last_result
             if isinstance(data, list) and len(data) > 0:
                 data = data[0]
             return last_result(data)
@@ -311,18 +317,25 @@ class HTMLParser(object):
 
         if not isinstance(self.last_result, (str, unicode)):
             return self.last_result
-        truth, var = self.is_variable(pattern)
-        if truth and isinstance(var, (str, unicode)):
-            pattern = var
+        rebuild_pattern = []
+        for word in pattern.split():
+            truth, var = self.is_variable(word)
+            if truth and isinstance(var, (str, unicode)):
+                rebuild_pattern.append(var)
+            else:
+                rebuild_pattern.append(word)
+        if len(rebuild_pattern) > 0:
+            pattern = " ".join(rebuild_pattern)
         exp = compile(pattern, IGNORECASE)
-        data = exp.findall(self.last_result)
-        if data is None:
+        regexp = exp.match(self.last_result)
+        if regexp is None:
             return self.last_result
-        if isinstance(data, list) and len(data) > 0:
-            data = data[0]
-        elif isinstance(data, list) and len(data) == 0:
-            return self.last_result
-        return data
+        for k, v in regexp.groupdict().iteritems():
+            self.keep_first_non_empty(k, v)
+        data = regexp.groups()
+        if len(data) > 0:
+            return data[0]
+        return self.last_result
 
     def perform_remove(self, remove):
         """Evaluate a regular expression and removes matching groups.
@@ -341,7 +354,7 @@ class HTMLParser(object):
             remove = var
         return sub(remove, "", self.last_result)
 
-    def perform_glue(self, glue):
+    def perform_glue(self, glue, sep=""):
         """Concatenate all strings from a list.
 
         Args:
@@ -351,13 +364,15 @@ class HTMLParser(object):
             mixt: New string, empty or None.
         """
 
+        if isinstance(glue, (str, unicode)):
+            glue, sep = glue.split(), " "
         if not isinstance(glue, list):
             return self.last_result
         items = []
         for each in glue:
             truth, var = self.is_variable(each)
             items.append(var if truth else each)
-        return "".join(items)
+        return sep.join(items)
 
     def perform_replace(self, old_replace, new_replace):
         """Replace string-A with string-B.
@@ -394,6 +409,10 @@ class HTMLParser(object):
         for k, v in configuration.iteritems():
             if k == Field.HEADERS and isinstance(v, dict):
                 self.headers = v
+            elif k == Field.PAYLOAD and isinstance(v, (str, unicode)):
+                self.payload = v
+            elif k == Field.PROXIES and isinstance(v, dict):
+                self.proxies = v
 
     def prepare_meta(self, metafields):
         """The "meta" protocol.
@@ -453,11 +472,11 @@ class HTMLParser(object):
         if not status:
             Log.fatal(u"Cannot reach link: {}".format(source))
             return self
-        if status and source.code != 200:
-            Log.warn(u"Non-200 status code: {}".format(source.code))
+        if status and not str(source.code).startswith("2"):
+            Log.warn(u"Non-2xx status code: {}".format(source.code))
         if hasattr(source.info(), "gettype"):
             mimetype = source.info().gettype()
-            if mimetype != "text/html":
+            if mimetype not in self.supported_mime_types:
                 Log.fatal(u"Unsupported content, got {}".format(mimetype))
         self.source = source.read()
         if not self.no_cache:
@@ -466,18 +485,19 @@ class HTMLParser(object):
                 Log.warn(status)
         return self
 
-    def read_url(self, url):
+    def read_url(self, url, **kwargs):
         """Retrieve HTTP stream by a request.
 
         Args:
-            url (str): URL to access.
+            url      (str): URL to access.
+            proxies (dict): List of proxy addresses to use.
 
         Returns:
             tuple: Boolean status and HTTP stream resource or error.
         """
 
         try:
-            return True, urlopen(self.decorate_headers(url))
+            return True, urlopen(self.decorate_headers(url), **kwargs)
         except Exception as e:
             return False, str(e)
 
