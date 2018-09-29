@@ -3,7 +3,7 @@ SRC_DIR=hap
 
 .PHONY: all clean build lint tests
 
-all: clean lint tests build
+all: clean lint tests
 
 build: lint tests
 	cd /tmp && virtualenv $(SRC_DIR) && cd $(SRC_DIR)
@@ -23,3 +23,6 @@ lint:
 
 tests:
 	python -m unittest discover -v tests
+
+install:
+	python setup.py install

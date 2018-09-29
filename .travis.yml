@@ -8,9 +8,9 @@ git:
 
 install:
   - pip install -r requirements.txt
+  - pip install flake8
 
 script:
-  - python setup.py test
-  - python setup.py install
+  - make && sudo make install
   - hap samples/sample.json --verbose --no-cache
   - hap samples/pattern.json --verbose --no-cache
