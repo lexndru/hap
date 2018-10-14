@@ -24,6 +24,7 @@ from lxml import html
 from datetime import datetime
 from urllib2 import urlopen, Request
 from re import sub, compile, IGNORECASE
+from os import path
 
 from hap.log import Log
 from hap.cache import Cache
@@ -43,6 +44,10 @@ class HTMLParser(object):
     refresh_records, no_cache = False, False
     headers, payload, proxies = dict(), None, None
     supported_mime_types = ("text/html", "text/xml")
+
+    FILE_PROTOCOL = "file://"
+    HTTP_PROTOCOL = "http://"
+    HTTPS_PROTOCOL = "https://"
 
     sections = (
         # field,      required, type
@@ -436,12 +441,24 @@ class HTMLParser(object):
         """
 
         self.link = link
-        ok, cache = Cache.read_link(self.link)
-        if not self.no_cache and ok:
-            Log.debug(u"Getting content from cache: {}".format(link))
-            return self.prepare_source_code_from_cache(cache)
-        Log.debug(u"Getting content from URL: {}".format(link))
-        return self.open_url().prepare_source_code()
+        if link.startswith(self.FILE_PROTOCOL):
+            filepath = link[len(self.FILE_PROTOCOL):]
+            if not path.exists(filepath):
+                Log.fatal("Cannot get content from file: file does not exist")
+            Log.debug(u"Getting content from local file: {}".format(link))
+            content = ""
+            with open(filepath) as fd:
+                content = fd.read()
+            return self.prepare_source_code_from_cache(content)
+        elif link.startswith(self.HTTP_PROTOCOL) \
+                or link.startswith(self.HTTPS_PROTOCOL):
+            ok, cache = Cache.read_link(self.link)
+            if not self.no_cache and ok:
+                Log.debug(u"Getting content from cache: {}".format(link))
+                return self.prepare_source_code_from_cache(cache)
+            Log.debug(u"Getting content from URL: {}".format(link))
+            return self.open_url().prepare_source_code()
+        Log.fatal(u"Unsupported link protocol: must be file or http(s)")
 
     def prepare_source_code_from_cache(self, cache_src):
         """Set source to cached source.

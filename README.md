@@ -28,6 +28,23 @@ optional arguments:
   --version    print version number
 ```
 
+## Dataplan directives
+
+Directive | Type | Description | Sample
+--------- | ---- | ----------- | ------
+`declare` | object | Collectable fields with conversion | `{"name": "text"}`
+`define`  | list of objects | Instructions to collect declared fields | `[{"name": {"query_xpath": "//*[@id='name']"}, "item": "AS IS" }]`
+`link`    | string | Source of HTML document to parse | `http://localhost` or `file:///tmp/document.html`
+`config`  | object | Outgoing configurable parameters | `{"headers": {"User-Agent": "Hap! for Linux"}}`
+`meta`    | object | Metadata about dataplan | `{"name": "general purpose dataplan", "tags": "anything"}`
+`records`* | list of objects | Collected results for declared fields | `[{"name": "some text after parsing"}]`
+
+Notes:
+ - The `records` directive is read-only; Hap! automatically updates (or creates) this directive and appends records with every run.
+ - The `meta` directive does not impact the functionality of Hap!, but instead is used to organize and identify dataplans.
+ - The current implementation allows only the `headers` as a configurable parameter for the `config` directive (headers can be anything).
+
+
 ## An educational example
 If we were to have an online store with a list of products, we could create a dataplan that describes the process of extracting some important aspects of a product such as product name, product price or product currency.
 
@@ -163,7 +180,7 @@ Note: scripts can capture verbose output and errors from stderr; and output resu
 {
     "config": {
         "headers": {
-            "User-Agent": "Hap/1.0.5 (Linux x86_64)"
+            "User-Agent": "Hap/version (Linux x86_64)"
         }
     },
     "link": "http://skyle.codeissues.net/",
