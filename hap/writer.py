@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import io
+
 from hap.util import print_json
 
 
@@ -37,7 +39,7 @@ class FileWriter(object):
         """
 
         try:
-            with open(self.filepath, "wb") as f:
+            with io.open(self.filepath, "w", encoding="utf8") as f:
                 return True, f.write(print_json(data, True))
         except Exception as e:
             return False, str(e)

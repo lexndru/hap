@@ -78,6 +78,10 @@ def main():
     if not status:
         raise SystemExit(data_in)
 
+    # A dataplan is always an object
+    if not isinstance(data_in, dict):
+        raise SystemExit("Corrupted input provided. Please fix and try again")
+
     # Log shell params
     if Shell.verbose and not Shell.silent:
         Log.info(u"Filepath: {}".format(Shell.input))

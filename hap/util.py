@@ -50,7 +50,8 @@ def print_json(data, retval=False):
     If retval is set to True, it returns output instead of printing.
     """
 
-    json_data = dumps(data, cls=DecimalEncoder, indent=4, sort_keys=True)
+    json_data = dumps(data, cls=DecimalEncoder, indent=4, sort_keys=True,
+                      ensure_ascii=False)
     if retval:
         return json_data
     print(json_data)
