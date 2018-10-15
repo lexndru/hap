@@ -30,8 +30,8 @@ optional arguments:
 
 ## Dataplan properties
 
-Directive | Type | Description | Sample
---------- | ---- | ----------- | ------
+Property | Type | Description | Sample
+-------- | ---- | ----------- | ------
 `declare` | object | Collectable fields with conversion | `{"name": "text"}`
 `define`  | list of objects | Instructions to collect declared fields | `[{"name": {"query_xpath": "//*[@id='name']"}, "item": "AS IS" }]`
 `link`    | string | Source of HTML document to parse | `http://localhost` or `file:///tmp/document.html`
