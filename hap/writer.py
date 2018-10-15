@@ -40,6 +40,9 @@ class FileWriter(object):
 
         try:
             with io.open(self.filepath, "w", encoding="utf8") as f:
-                return True, f.write(print_json(data, True))
+                content = print_json(data, True)
+                if isinstance(content, str):
+                    content = content.decode("utf-8")
+                return True, f.write(content)
         except Exception as e:
             return False, str(e)

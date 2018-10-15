@@ -51,7 +51,7 @@ def print_json(data, retval=False):
     """
 
     json_data = dumps(data, cls=DecimalEncoder, indent=4, sort_keys=True,
-                      ensure_ascii=False)
+                      ensure_ascii=False, encoding="utf-8")
     if retval:
         return json_data
     print(json_data)
