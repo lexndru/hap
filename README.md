@@ -28,7 +28,7 @@ optional arguments:
   --version    print version number
 ```
 
-## Dataplan directives
+## Dataplan properties
 
 Directive | Type | Description | Sample
 --------- | ---- | ----------- | ------
