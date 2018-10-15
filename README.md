@@ -44,6 +44,27 @@ Notes:
  - The `meta` directive does not impact the functionality of Hap!, but instead is used to organize and identify dataplans.
  - The current implementation allows only the `headers` as a configurable parameter for the `config` directive (headers can be anything).
 
+## Fields
+Alias | Description
+----- | -----------
+`decimal` | Precision correctly-rounded floating point
+`string`, `text` | Any sequence of characters including empty spaces
+`integer` | Numeric values up to 2^63 - 1
+`ascii` | ASCII only strings (only if you know what you're doing)
+`bytes` | Raw sequence of bytes (only if you know what you're doing)
+`percentage` | Floating point number with up to 53 bits of precision
+`boolean` | Represent truth value of an expression
+
+## Directives
+Directive | Arguments | Description | Sample
+--------- | --------- | ----------- | ------
+`query_css` | (string) CSS selector | Return result of evaluated CSS selector | `{"query_css": "h1.title"}`
+`query_xpath` | (string) XPath expression | Return result of evaluated XPath expression | `{"query_xpath": "//h1[@class='title']"}`
+`query` | (string) CSS selector | Alias of `query_css` | `{"query_css": "body > div > a.active"}`
+`pattern` | (string) RegEx | Extract first unnamed group or save all named groups as variables | `{"pattern": "Hello, (?P<subject>\w+)!"}`
+`remove` | (string) RegEx | Remove matching regex from the previous stored value | `{"remove": "\D+"}`
+`replace` | (list:2) RegEx, String | Replace a regex or a string with another string | `{"replace": ["\D+", "-"]}}`
+`glue` | (list:n) String, String ... | Concatenate strings with variable interpolation support | `{"glue": ["My name is", ":me"]}`
 
 ## An educational example
 If we were to have an online store with a list of products, we could create a dataplan that describes the process of extracting some important aspects of a product such as product name, product price or product currency.
