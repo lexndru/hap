@@ -40,9 +40,9 @@ Property | Type | Description | Sample
 `records`* | list of objects | Collected results for declared fields | `[{"name": "some text after parsing"}]`
 
 Notes:
- - The `records` directive is read-only; Hap! automatically updates (or creates) this directive and appends records with every run.
- - The `meta` directive does not impact the functionality of Hap!, but instead is used to organize and identify dataplans.
- - The current implementation allows only the `headers` as a configurable parameter for the `config` directive (headers can be anything).
+ - The `records` property is read-only; Hap! automatically updates (or creates) this property and appends records with every run.
+ - The `meta` property does not impact the functionality of Hap!, but instead is used to organize and identify dataplans.
+ - The current implementation allows only the `headers` as a configurable parameter for the `config` property (headers can be anything).
 
 ## Fields
 Alias | Description
