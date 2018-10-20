@@ -54,4 +54,4 @@ def print_json(data, retval=False):
                       ensure_ascii=False, encoding="utf-8")
     if retval:
         return json_data
-    print(json_data)
+    print(json_data.encode("utf-8"))
