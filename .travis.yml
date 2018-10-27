@@ -16,9 +16,12 @@ matrix:
         - pip install flake8
         - pip install -U pip setuptools
 
+      before_script:
+        - flake8 python2/hap
+        - python -m unittest discover -v python2/tests
+        - python python2/setup.py install
+
       script:
-        - make lint-py2 && make test-py2
-        - sudo make install-py2
         - hap examples/sample.json --verbose --no-cache
         - hap examples/pattern.json --verbose --no-cache
 
@@ -30,13 +33,15 @@ matrix:
         depth: 3
 
       install:
-        - sudo apt-get install python3-pip python3-setuptools
         - pip3 install -r python3/requirements.txt
         - pip3 install flake8
         - pip3 install -U pip setuptools
 
+      before_script:
+        - flake8 python3/hap
+        - python -m unittest discover -v python3/tests
+        - python python3/setup.py install
+
       script:
-        - make lint-py3 && make test-py3
-        - sudo make install-py3
         - hap examples/sample.json --verbose --no-cache
         - hap examples/pattern.json --verbose --no-cache
