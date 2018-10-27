@@ -1,3 +1,5 @@
+dist: "trusty"
+
 matrix:
   include:
 
@@ -27,9 +29,10 @@ matrix:
         depth: 3
 
       install:
-        - pip install -r python3/requirements.txt
-        - pip install flake8
-        - pip install -U pip setuptools
+        - apt-get install python3-pip python3-setuptools
+        - pip3 install -r python3/requirements.txt
+        - pip3 install flake8
+        - pip3 install -U pip setuptools
 
       script:
         - make lint-py3 && make test-py3
