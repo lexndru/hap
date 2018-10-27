@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2018 Alexandru Catrina
+# Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from decimal import Decimal
+import io
+
+from hap.util import print_json
 
 
-class Field(object):
-    """Supported fields instances for dataplans.
+class FileWriter(object):
+    """Output file writer wrapper.
     """
 
-    RECORDS, META, CONFIG, HEADERS = r"records", r"meta", r"config", r"headers"
-    PAYLOAD, PROXIES = r"payload", r"proxies"
+    def __init__(self, filepath):
+        if not isinstance(filepath, (str, unicode)):
+            raise Exception("Filepath must be string")
+        self.filepath = filepath
 
-    LINK, DECLARE, DEFINE = r"link", r"declare", r"define"
+    def write(self, data):
+        """Write provided content data to filepath.
+        """
 
-    DATA_TYPES = {
-        # palceholder   convertion
-        r"decimal":     Decimal,
-        r"string":      unicode,
-        r"text":        unicode,
-        r"integer":     int,
-        r"ascii":       str,
-        r"bytes":       bytes,
-        r"percentage":  float,
-        r"boolean":     bool,
-    }
+        try:
+            with io.open(self.filepath, "w", encoding="utf8") as f:
+                content = print_json(data, True)
+                if isinstance(content, str):
+                    content = content.decode("utf-8")
+                return True, f.write(content)
+        except Exception as e:
+            return False, str(e)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2018 Alexandru Catrina
+# Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,5 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import logging
 
-__version__ = "1.2.3"
+
+class Log(object):
+    """Log wrapper. That's it...
+    """
+
+    config = {
+        r"format": r"%(asctime)-15s %(message)s"
+    }
+
+    @classmethod
+    def configure(cls, verbose=False):
+        cls.config["level"] = logging.DEBUG if verbose else logging.INFO
+        logging.basicConfig(**cls.config)
+
+    @classmethod
+    def info(cls, message):
+        logging.info(message)
+
+    @classmethod
+    def debug(cls, message):
+        logging.debug(message)
+
+    @classmethod
+    def warn(cls, message):
+        logging.warning(message)
+
+    @classmethod
+    def error(cls, message):
+        logging.error(message)
+
+    @classmethod
+    def fatal(cls, message):
+        cls.error(message)
+        raise SystemExit(message)

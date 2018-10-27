@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2018 Alexandru Catrina
+# Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,38 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from __future__ import print_function
+from os import remove
+from unittest import TestCase
 
-from json import dumps, JSONEncoder
-from decimal import Decimal
-
-
-SAMPLES_MESSAGE = """
-  Hap! A simple HTML parser and scraping tool
-  Visit https://github.com/lexndru/hap for documentation and samples
-"""
+from hap.reader import FileReader
+from hap.writer import FileWriter
 
 
-class DecimalEncoder(JSONEncoder):
-    """Helper class used for JSON dumps.
+class TestReaderWriter(TestCase):
 
-    Convert Python decimals to JSON-like appropriate datatype.
-    """
-
-    def default(self, o):
-        if isinstance(o, Decimal):
-            return float(o)
-        return super(DecimalEncoder, self).default(o)
-
-
-def print_json(data, retval=False):
-    """Outputs pretty formatted JSON.
-
-    If retval is set to True, it returns output instead of printing.
-    """
-
-    json_data = dumps(data, cls=DecimalEncoder, indent=4, sort_keys=True,
-                      ensure_ascii=False, encoding="utf-8")
-    if retval:
-        return json_data
-    print(json_data.encode("utf-8"))
+    def test_read_write(self):
+        data = {"hap": "lorem ipsum", "test": True}
+        with self.assertRaises(Exception) as context:
+            FileWriter(None)
+            self.assertTrue("Filepath must be string" in context.exception)
+        fw = FileWriter("/tmp/.hap.tmp")
+        ok, error = fw.write(data)
+        self.assertTrue(ok)
+        with self.assertRaises(Exception) as context:
+            FileReader(None)
+            self.assertTrue("Filepath must be string" in context.exception)
+        fr = FileReader("/tmp/.hap.tmp")
+        ok, content = fr.read()
+        self.assertTrue(ok)
+        self.assertEqual(content, data)
+        remove("/tmp/.hap.tmp")

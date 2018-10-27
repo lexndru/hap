@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2018 Alexandru Catrina
+# Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import logging
+from __future__ import print_function
+
+from json import dumps, JSONEncoder
+from decimal import Decimal
 
 
-class Log(object):
-    """Log wrapper. That's it...
+SAMPLES_MESSAGE = """
+  Hap! A simple HTML parser and scraping tool
+  Visit https://github.com/lexndru/hap for documentation and samples
+"""
+
+
+class DecimalEncoder(JSONEncoder):
+    """Helper class used for JSON dumps.
+
+    Convert Python decimals to JSON-like appropriate datatype.
     """
 
-    config = {
-        r"format": r"%(asctime)-15s %(message)s"
-    }
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 
-    @classmethod
-    def configure(cls, verbose=False):
-        cls.config["level"] = logging.DEBUG if verbose else logging.INFO
-        logging.basicConfig(**cls.config)
 
-    @classmethod
-    def info(cls, message):
-        logging.info(message)
+def print_json(data, retval=False):
+    """Outputs pretty formatted JSON.
 
-    @classmethod
-    def debug(cls, message):
-        logging.debug(message)
+    If retval is set to True, it returns output instead of printing.
+    """
 
-    @classmethod
-    def warn(cls, message):
-        logging.warning(message)
-
-    @classmethod
-    def error(cls, message):
-        logging.error(message)
-
-    @classmethod
-    def fatal(cls, message):
-        cls.error(message)
-        raise SystemExit(message)
+    json_data = dumps(data, cls=DecimalEncoder, indent=4, sort_keys=True,
+                      ensure_ascii=False, encoding="utf-8")
+    if retval:
+        return json_data
+    print(json_data.encode("utf-8"))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2018 Alexandru Catrina
+# Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from os import remove
-from unittest import TestCase
-
-from hap.reader import FileReader
-from hap.writer import FileWriter
+from json import loads
 
 
-class TestReaderWriter(TestCase):
+class FileReader(object):
+    """Input file reader wrapper.
+    """
 
-    def test_read_write(self):
-        data = {"hap": "lorem ipsum", "test": True}
-        with self.assertRaises(Exception) as context:
-            FileWriter(None)
-            self.assertTrue("Filepath must be string" in context.exception)
-        fw = FileWriter("/tmp/.hap.tmp")
-        ok, error = fw.write(data)
-        self.assertTrue(ok)
-        with self.assertRaises(Exception) as context:
-            FileReader(None)
-            self.assertTrue("Filepath must be string" in context.exception)
-        fr = FileReader("/tmp/.hap.tmp")
-        ok, content = fr.read()
-        self.assertTrue(ok)
-        self.assertEqual(content, data)
-        remove("/tmp/.hap.tmp")
+    def __init__(self, filepath):
+        if not isinstance(filepath, (str, unicode)):
+            raise Exception("Filepath must be string")
+        self.filepath = filepath
+
+    def read(self):
+        """Returns content of filepath.
+        """
+
+        try:
+            with open(self.filepath, "rb") as f:
+                return True, FileReader.parse_json(f.read())
+        except Exception as e:
+            return False, str(e)
+
+    @staticmethod
+    def parse_json(data):
+        """Returns parsed JSON content.
+        """
+
+        try:
+            return loads(data)
+        except Exception:
+            return None

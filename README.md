@@ -1,7 +1,7 @@
 # Hap!
 [![Build Status](https://travis-ci.org/lexndru/hap.svg?branch=master)](https://travis-ci.org/lexndru/hap)
 
-Hap! is an HTML parser and scraping tool written in Python.
+Hap! is an HTML parser and scraping tool originally written in Python2/3 and ported to Node.js, Java and Go.
 
 The purpose of Hap! is to have a simple and fast way to retrieve certain data from the internet. It uses JSON formatted data as input and output. Input can be either from a local file or from stdin from another process. Output is either printed to stdout or saved to file. If input is provided by file, Hap! names it dataplan ("data planning") and the same file is used when the output is saved.
 
@@ -11,7 +11,8 @@ usage: hap [-h] [--sample] [--link LINK] [--save] [--verbose] [--no-cache]
            [--refresh] [--silent] [--version]
            [input]
 
-Hap! Simple HTML scraping tool
+Hap: Hap! another parser...
+A simple HTML scraping tool
 
 positional arguments:
   input        your JSON formated dataplan input
