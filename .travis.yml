@@ -17,9 +17,10 @@ matrix:
         - pip install -U pip setuptools
 
       before_script:
-        - flake8 python2/hap
-        - python -m unittest discover -v python2/tests
-        - python python2/setup.py install
+        - cd python2
+        - flake8 hap
+        - python -m unittest discover -v tests
+        - python setup.py install
 
       script:
         - hap examples/sample.json --verbose --no-cache
@@ -38,9 +39,10 @@ matrix:
         - pip install -U pip setuptools
 
       before_script:
-        - flake8 python3/hap
-        - python -m unittest discover -v python3/tests
-        - python python3/setup.py install
+        - cd python3
+        - flake8 hap
+        - python -m unittest discover -v tests
+        - python setup.py install
 
       script:
         - hap examples/sample.json --verbose --no-cache
