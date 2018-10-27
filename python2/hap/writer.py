@@ -43,6 +43,7 @@ class FileWriter(object):
                 content = print_json(data, True)
                 if isinstance(content, str):
                     content = content.decode("utf-8")
-                return True, f.write(content)
+                f.write(content)
+                return True, "ok"
         except Exception as e:
             return False, str(e)

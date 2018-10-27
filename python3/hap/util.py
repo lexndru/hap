@@ -20,34 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from json import loads
+from typing import Union
+
+from json import dumps, JSONEncoder
+from decimal import Decimal
 
 
-class FileReader(object):
-    """Input file reader wrapper.
+SAMPLES_MESSAGE = """
+  Hap! A simple HTML parser and scraping tool
+  Visit https://github.com/lexndru/hap for documentation and samples
+"""
+
+
+class DecimalEncoder(JSONEncoder):
+    """Helper class used for JSON dumps.
+
+    Convert Python decimals to JSON-like appropriate datatype.
     """
 
-    def __init__(self, filepath):
-        if not isinstance(filepath, (str, unicode)):
-            raise Exception("Filepath must be string")
-        self.filepath = filepath
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 
-    def read(self):
-        """Returns content of filepath.
-        """
 
-        try:
-            with open(self.filepath, "r") as f:
-                return True, FileReader.parse_json(f.read())
-        except Exception as e:
-            return False, str(e)
+def print_json(data: dict, retval: bool=False) -> Union[str, None]:
+    """Outputs pretty formatted JSON.
 
-    @staticmethod
-    def parse_json(data):
-        """Returns parsed JSON content.
-        """
+    If retval is set to True, it returns output instead of printing.
+    """
 
-        try:
-            return loads(data)
-        except Exception:
-            return None
+    json_data = dumps(data, cls=DecimalEncoder, indent=4, sort_keys=True,
+                      ensure_ascii=False)
+    if retval:
+        return json_data
+    print(json_data)

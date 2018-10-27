@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Tuple, Union
+
 from json import loads
 
 
@@ -27,12 +29,12 @@ class FileReader(object):
     """Input file reader wrapper.
     """
 
-    def __init__(self, filepath):
-        if not isinstance(filepath, (str, unicode)):
+    def __init__(self, filepath: str):
+        if not isinstance(filepath, str):
             raise Exception("Filepath must be string")
         self.filepath = filepath
 
-    def read(self):
+    def read(self) -> Tuple[bool, str]:
         """Returns content of filepath.
         """
 
@@ -43,7 +45,7 @@ class FileReader(object):
             return False, str(e)
 
     @staticmethod
-    def parse_json(data):
+    def parse_json(data: str) -> Union[dict, None]:
         """Returns parsed JSON content.
         """
 

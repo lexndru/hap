@@ -20,9 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Tuple, Any, Union
+
+from collections import Callable
+
 from lxml import html
 from datetime import datetime
-from urllib2 import urlopen, Request
+from urllib.request import urlopen, Request
 from re import sub, compile, IGNORECASE
 from os import path
 
@@ -53,12 +57,13 @@ class HTMLParser(object):
         # field,      required, type
         (Field.META,    False,  dict),
         (Field.CONFIG,  False,  dict),
-        (Field.LINK,    True,   unicode),
+        (Field.LINK,    True,   str),
         (Field.DEFINE,  True,   list),
         (Field.DECLARE, True,   dict),
     )
 
-    def __init__(self, dataplan=None, no_cache=False, refresh=False):
+    def __init__(self, dataplan: dict=None, no_cache: bool=False,
+                 refresh: bool=False):
         if not isinstance(dataplan, dict):
             raise Exception("Unexpected dataplan received: required dict")
         self.dataplan = dataplan
@@ -66,7 +71,7 @@ class HTMLParser(object):
         self.refresh_records = refresh
         Log.debug("HTML Parser initialized")
 
-    def run(self):
+    def run(self) -> "HTMLParser":
         """Run parser across all sections.
 
         Rises:
@@ -90,14 +95,14 @@ class HTMLParser(object):
             key_exists = sec in self.dataplan
             if not key_exists:
                 if required:
-                    Log.fatal(u"Missing required section: '{}'".format(sec))
+                    Log.fatal("Missing required section: '{}'".format(sec))
                 else:
                     continue
             if key_exists and not isinstance(data, datatype):
                 err = (sec, datatype)
-                Log.fatal(u"Wrong type: section '{}' must be {}".format(*err))
+                Log.fatal("Wrong type: section '{}' must be {}".format(*err))
             if not hasattr(self, "prepare_{}".format(sec)):
-                Log.fatal(u"Unsupported section '{}'".format(sec))
+                Log.fatal("Unsupported section '{}'".format(sec))
             getattr(self, "prepare_{}".format(sec))(data)
 
         Log.debug("Logging records datetime...")
@@ -105,7 +110,7 @@ class HTMLParser(object):
         Log.debug("Done...")
         return self
 
-    def get_dataplan(self):
+    def get_dataplan(self) -> dict:
         """Dataplan getter.
 
         Returns:
@@ -122,7 +127,7 @@ class HTMLParser(object):
         self.dataplan.update({Field.RECORDS: records})
         return self.dataplan
 
-    def get_records(self):
+    def get_records(self) -> dict:
         """Records getter.
 
         Returns:
@@ -131,7 +136,7 @@ class HTMLParser(object):
 
         return self.records
 
-    def prepare_declare(self, declarations):
+    def prepare_declare(self, declarations: dict) -> None:
         """The "declare" protocol.
 
         The output of the program uses declared values to create records.
@@ -140,21 +145,21 @@ class HTMLParser(object):
         will be used to transform collected data into desired data.
         """
 
-        for key, datatype in declarations.iteritems():
+        for key, datatype in declarations.items():
             if key not in self.data:
-                Log.warn(u"No data found for key '{}'".format(key))
+                Log.warn("No data found for key '{}'".format(key))
             value = self.data.get(key)
             convert_func = Field.DATA_TYPES.get(datatype)
-            if value is not None and callable(convert_func):
+            if value is not None and isinstance(convert_func, Callable):
                 try:
                     value = convert_func(value)
                 except Exception as e:
-                    Log.warn(u"Cannot convert value because {}".format(e))
+                    Log.warn("Cannot convert value because {}".format(e))
             self.records.update({key: value})
             args = (key, value, datatype)
-            Log.debug(u"Updating records with '{}' as '{}' ({})".format(*args))
+            Log.debug("Updating records with '{}' as '{}' ({})".format(*args))
 
-    def prepare_define(self, definitions):
+    def prepare_define(self, definitions: list) -> None:
         """The "define" protocol.
 
         The runtime of the program uses defined values to create temporary
@@ -168,7 +173,7 @@ class HTMLParser(object):
 
         [self.parse_definition(d) for d in definitions if len(d) > 0]
 
-    def parse_definition(self, entry):
+    def parse_definition(self, entry: dict) -> None:
         """A "define" protocol helper.
 
         Parse each defined entry and choose it's correct action to apply.
@@ -179,14 +184,14 @@ class HTMLParser(object):
                           "got {n} ..."
             Log.warn(warning_msg.format(n=len(entry)))
         try:
-            self.def_key, val = entry.items().pop()
-            Log.debug(u"Parsing definition for '{}'".format(self.def_key))
+            self.def_key, val = list(entry.items()).pop()
+            Log.debug("Parsing definition for '{}'".format(self.def_key))
             key_value = self.eval_def_value(val)
             self.keep_first_non_empty(self.def_key, key_value)
         except Exception as e:
-            Log.error(u"Cannot parse definitions: {}".format(e))
+            Log.error("Cannot parse definitions: {}".format(e))
 
-    def keep_first_non_empty(self, key, value):
+    def keep_first_non_empty(self, key: str, value: str) -> None:
         """A "define" protocol helper.
 
         Keeps track only of the first non-empty evaluated result.
@@ -195,7 +200,7 @@ class HTMLParser(object):
         if self.data.get(key) is None and value is not None:
             self.data[key] = value
 
-    def eval_def_value(self, value):
+    def eval_def_value(self, value: Union[str, dict, list]) -> Any:
         """A "define" protocol helper.
 
         Evaluate a defined property and returns it's content.
@@ -208,10 +213,10 @@ class HTMLParser(object):
         """
 
         self.last_result = None
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, str):
             self.last_result = value
             key, result = self.def_key, self.last_result
-            Log.debug(u"Performing {}:assignment => {}".format(key, result))
+            Log.debug("Performing {}:assignment => {}".format(key, result))
         elif isinstance(value, dict):
             self.last_result = self.perform(**value)
         elif isinstance(value, list):
@@ -220,7 +225,7 @@ class HTMLParser(object):
                 self.last_result = actions[-1]
         return self.last_result
 
-    def is_variable(self, string):
+    def is_variable(self, string: str) -> Tuple[bool, str]:
         """Checks if a string is a placeholed for a variable.
 
         Args:
@@ -236,8 +241,9 @@ class HTMLParser(object):
                 return True, var
         return False, string
 
-    def perform(self, query=None, query_css=None, query_xpath=None,
-                pattern=None, remove=None, glue=None, replace=None):
+    def perform(self, query: str=None, query_css: str=None,
+                query_xpath: str=None, pattern: str=None, remove: str=None,
+                glue: list=None, replace: list=None) -> Any:
         """Perfomer dispatcher.
 
         Args:
@@ -257,31 +263,31 @@ class HTMLParser(object):
             query_css = query
         if query_css is not None:
             self.last_result = self.perform_query(query_css)
-            Log.debug(u"Performing {}:query:css '{}' => {}".format(
+            Log.debug("Performing {}:query:css '{}' => {}".format(
                         self.def_key, query_css, self.last_result))
         elif query_xpath is not None:
             self.last_result = self.perform_query(query_xpath, xpath=True)
-            Log.debug(u"Performing {}:query:xpath '{}' => {}".format(
+            Log.debug("Performing {}:query:xpath '{}' => {}".format(
                         self.def_key, query_xpath, self.last_result))
         elif pattern is not None:
             self.last_result = self.perform_pattern(pattern)
-            Log.debug(u"Performing {}:pattern '{}' => {}".format(
+            Log.debug("Performing {}:pattern '{}' => {}".format(
                         self.def_key, pattern, self.last_result))
         elif remove is not None:
             self.last_result = self.perform_remove(remove)
-            Log.debug(u"Performing {}:remove '{}' => {}".format(
+            Log.debug("Performing {}:remove '{}' => {}".format(
                         self.def_key, remove, self.last_result))
         elif glue is not None:
             self.last_result = self.perform_glue(glue)
-            Log.debug(u"Performing {}:glue '{}' => {}".format(
+            Log.debug("Performing {}:glue '{}' => {}".format(
                         self.def_key, glue, self.last_result))
         elif replace is not None:
             self.last_result = self.perform_replace(*replace)
-            Log.debug(u"Performing {}:replace '{}' => {}".format(
+            Log.debug("Performing {}:replace '{}' => {}".format(
                         self.def_key, replace, self.last_result))
         return self.last_result
 
-    def perform_query(self, query, xpath=False):
+    def perform_query(self, query: str, xpath: bool=False) -> Union[str, None]:
         """Evaluate a CSS selector or a XPath expression.
 
         Args:
@@ -313,7 +319,7 @@ class HTMLParser(object):
         except Exception:
             return self.last_result
 
-    def perform_pattern(self, pattern):
+    def perform_pattern(self, pattern: str) -> Union[str, None]:
         """Evaluate a regular expression and returns first group.
 
         Args:
@@ -323,12 +329,12 @@ class HTMLParser(object):
             mixt: String if data is found, otherwise None or empty.
         """
 
-        if not isinstance(self.last_result, (str, unicode)):
+        if not isinstance(self.last_result, str):
             return self.last_result
         rebuild_pattern = []
         for word in pattern.split():
             truth, var = self.is_variable(word)
-            if truth and isinstance(var, (str, unicode)):
+            if truth and isinstance(var, str):
                 rebuild_pattern.append(var)
             else:
                 rebuild_pattern.append(word)
@@ -338,14 +344,14 @@ class HTMLParser(object):
         regexp = exp.match(self.last_result)
         if regexp is None:
             return self.last_result
-        for k, v in regexp.groupdict().iteritems():
+        for k, v in regexp.groupdict().items():
             self.keep_first_non_empty(k, v)
         data = regexp.groups()
         if len(data) > 0:
             return data[0]
         return self.last_result
 
-    def perform_remove(self, remove):
+    def perform_remove(self, remove: str) -> Union[str, None]:
         """Evaluate a regular expression and removes matching groups.
 
         Args:
@@ -355,14 +361,14 @@ class HTMLParser(object):
             mixt: New string, empty or None.
         """
 
-        if not isinstance(self.last_result, (str, unicode)):
+        if not isinstance(self.last_result, str):
             return self.last_result
         truth, var = self.is_variable(remove)
-        if truth and isinstance(var, (str, unicode)):
+        if truth and isinstance(var, str):
             remove = var
         return sub(remove, "", self.last_result)
 
-    def perform_glue(self, glue, sep=""):
+    def perform_glue(self, glue: list, sep: str="") -> Union[str, None]:
         """Concatenate all strings from a list.
 
         Args:
@@ -372,7 +378,7 @@ class HTMLParser(object):
             mixt: New string, empty or None.
         """
 
-        if isinstance(glue, (str, unicode)):
+        if isinstance(glue, str):
             glue, sep = glue.split(), " "
         if not isinstance(glue, list):
             return self.last_result
@@ -382,7 +388,8 @@ class HTMLParser(object):
             items.append(var if truth else each)
         return sep.join(items)
 
-    def perform_replace(self, old_replace, new_replace):
+    def perform_replace(self, old_replace: str,
+                        new_replace: str) -> Union[str, None]:
         """Replace string-A with string-B.
 
         Args:
@@ -393,19 +400,19 @@ class HTMLParser(object):
             mixt: New string, empty or None.
         """
 
-        if not isinstance(self.last_result, (str, unicode)):
+        if not isinstance(self.last_result, str):
             return self.last_result
 
         def test_var(val):
             truth, var = self.is_variable(val)
-            if truth and isinstance(var, (str, unicode)):
+            if truth and isinstance(var, str):
                 val = var
             return val
 
         old, new = test_var(old_replace), test_var(new_replace)
         return sub(old, new, self.last_result)
 
-    def prepare_config(self, configuration):
+    def prepare_config(self, configuration: dict) -> None:
         """The "config" protocol.
 
         Configure requester with HTTP client-related options such as
@@ -414,15 +421,15 @@ class HTMLParser(object):
         Only HTTP headers are supported at the moment.
         """
 
-        for k, v in configuration.iteritems():
+        for k, v in configuration.items():
             if k == Field.HEADERS and isinstance(v, dict):
                 self.headers = v
-            elif k == Field.PAYLOAD and isinstance(v, (str, unicode)):
+            elif k == Field.PAYLOAD and isinstance(v, str):
                 self.payload = v
             elif k == Field.PROXIES and isinstance(v, dict):
                 self.proxies = v
 
-    def prepare_meta(self, metafields):
+    def prepare_meta(self, metafields: dict) -> None:
         """The "meta" protocol.
 
         Meta fields are trated AS-IS and the only benefit of these fields is
@@ -431,10 +438,10 @@ class HTMLParser(object):
 
         if len(metafields) > 0:
             Log.debug("Listing meta fields")
-            for k, v in metafields.iteritems():
+            for k, v in metafields.items():
                 Log.debug(" {} = {}".format(k, v))
 
-    def prepare_link(self, link):
+    def prepare_link(self, link: str) -> Any:
         """The "link" protocol.
 
         Set or update the link of the dataplan. Can be cached.
@@ -445,7 +452,7 @@ class HTMLParser(object):
             filepath = link[len(self.FILE_PROTOCOL):]
             if not path.exists(filepath):
                 Log.fatal("Cannot get content from file: file does not exist")
-            Log.debug(u"Getting content from local file: {}".format(link))
+            Log.debug("Getting content from local file: {}".format(link))
             content = ""
             with open(filepath) as fd:
                 content = fd.read()
@@ -454,20 +461,20 @@ class HTMLParser(object):
                 or link.startswith(self.HTTPS_PROTOCOL):
             ok, cache = Cache.read_link(self.link)
             if not self.no_cache and ok:
-                Log.debug(u"Getting content from cache: {}".format(link))
+                Log.debug("Getting content from cache: {}".format(link))
                 return self.prepare_source_code_from_cache(cache)
-            Log.debug(u"Getting content from URL: {}".format(link))
+            Log.debug("Getting content from URL: {}".format(link))
             return self.open_url().prepare_source_code()
-        Log.fatal(u"Unsupported link protocol: must be file or http(s)")
+        Log.fatal("Unsupported link protocol: must be file or http(s)")
 
-    def prepare_source_code_from_cache(self, cache_src):
+    def prepare_source_code_from_cache(self, cache_src: str) -> "HTMLParser":
         """Set source to cached source.
         """
 
         self.source = cache_src
         return self.prepare_source_code()
 
-    def prepare_source_code(self):
+    def prepare_source_code(self) -> "HTMLParser":
         """Transforms plain string to HTML/XML nodes.
 
         Raises a warning if source is not set. The HTML document has the root
@@ -479,7 +486,7 @@ class HTMLParser(object):
         self.source_code = html.fromstring(self.source)
         return self
 
-    def open_url(self):
+    def open_url(self) -> "HTMLParser":
         """Simple URL reader.
 
         Access an URL and read it's content. Can be cached.
@@ -490,14 +497,14 @@ class HTMLParser(object):
 
         status, source = self.read_url(self.link)
         if not status:
-            Log.fatal(u"Cannot reach link: {}".format(source))
+            Log.fatal("Cannot reach link: {}".format(source))
             return self
         if status and not str(source.code).startswith("2"):
-            Log.warn(u"Non-2xx status code: {}".format(source.code))
+            Log.warn("Non-2xx status code: {}".format(source.code))
         if hasattr(source.info(), "gettype"):
             mimetype = source.info().gettype()
             if mimetype not in self.supported_mime_types:
-                Log.fatal(u"Unsupported content, got {}".format(mimetype))
+                Log.fatal("Unsupported content, got {}".format(mimetype))
         self.source = source.read()
         if not self.no_cache:
             ok, status = Cache.write_link(self.link, self.source)
@@ -505,7 +512,7 @@ class HTMLParser(object):
                 Log.warn(status)
         return self
 
-    def read_url(self, url, **kwargs):
+    def read_url(self, url: str, **kwargs) -> Tuple[bool, str]:
         """Retrieve HTTP stream by a request.
 
         Args:
@@ -521,7 +528,7 @@ class HTMLParser(object):
         except Exception as e:
             return False, str(e)
 
-    def decorate_headers(self, link):
+    def decorate_headers(self, link: str) -> Any:
         """Add headers to request.
 
         Args:
@@ -532,12 +539,12 @@ class HTMLParser(object):
         """
 
         if self.headers:
-            Log.debug(u"Outgoing HTTP headers: {}".format(self.headers))
+            Log.debug("Outgoing HTTP headers: {}".format(self.headers))
             return Request(link, headers=self.headers)
         return Request(link)
 
     @classmethod
-    def run_get_records(cls, data, no_cache):
+    def run_get_records(cls, data: dict, no_cache: bool) -> dict:
         """Launch parser and return records.
 
         Args:
@@ -552,7 +559,8 @@ class HTMLParser(object):
         return psr.run().get_records()
 
     @classmethod
-    def run_get_dataplan(cls, data, no_cache, refresh):
+    def run_get_dataplan(cls, data: dict, no_cache: bool,
+                         refresh: bool) -> dict:
         """Launch parser and return dataplan.
 
         Args:

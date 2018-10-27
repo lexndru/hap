@@ -26,9 +26,13 @@ NODE_SRC=nodejs
 JAVA_SRC=java
 GO_SRC=go
 
-.PHONY: all clean-py2 build-py2 lint-py2 test-py2 install-py2 release-py2
+.PHONY: all clean-py2 build-py2 lint-py2 test-py2 install-py2 release-py2 \
+			clean-py3 build-py3 lint-py3 test-py3 install-py3 release-py3
 
-all: clean-py2 lint-py2 test-py2
+all: init clean-py2 lint-py2 test-py2 clean-py3 lint-py3 test-py3
+
+init:
+	@chmod +x -R bin/
 
 build-py2: lint-py2 test-py2
 	@echo "Creating temporary build directory for Python2.x ..."
@@ -59,4 +63,35 @@ test-py2:
 install-py2:
 	@echo "Installing Python2.x from current sources ..."
 	@cd $(PY2_SRC) && python setup.py install
+	@echo "Done"
+
+build-py3: lint-py3 test-py3
+	@echo "Creating temporary build directory for Python3.x ..."
+	@cd /tmp && virtualenv $(APP_DIR) && cd $(APP_DIR)
+	@cp -R $(CWD)/$(PY3_SRC) /tmp/$(APP_DIR)
+	@echo "Done"
+
+clean-py3:
+	@echo "Cleaning Python3.x temporary files ..."
+	@cd $(PY3_SRC) && find . -regextype posix-extended -regex ".*.pyc" -type f -delete
+	@echo "Done"
+
+release-py3: build
+	@echo "Creating Python3.x release distribution ..."
+	@cd /tmp/$(APP_DIR)/$(APP_DIR) && python3 setup.py sdist
+	@echo "Done"
+
+lint-py3:
+	@echo "Checking Python3.x sources ..."
+	@cd $(PY3_SRC) && flake8 $(APP_DIR)
+	@echo "Done"
+
+test-py3:
+	@echo "Checking Python3.x tests ..."
+	@cd $(PY3_SRC) && python3 -m unittest discover -v tests
+	@echo "Done"
+
+install-py3:
+	@echo "Installing Python3.x from current sources ..."
+	@cd $(PY3_SRC) && python3 setup.py install
 	@echo "Done"

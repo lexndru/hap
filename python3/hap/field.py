@@ -20,34 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from json import loads
+from decimal import Decimal
 
 
-class FileReader(object):
-    """Input file reader wrapper.
+class Field(object):
+    """Supported fields instances for dataplans.
     """
 
-    def __init__(self, filepath):
-        if not isinstance(filepath, (str, unicode)):
-            raise Exception("Filepath must be string")
-        self.filepath = filepath
+    RECORDS, META, CONFIG, HEADERS = r"records", r"meta", r"config", r"headers"
+    PAYLOAD, PROXIES = r"payload", r"proxies"
 
-    def read(self):
-        """Returns content of filepath.
-        """
+    LINK, DECLARE, DEFINE = r"link", r"declare", r"define"
 
-        try:
-            with open(self.filepath, "r") as f:
-                return True, FileReader.parse_json(f.read())
-        except Exception as e:
-            return False, str(e)
-
-    @staticmethod
-    def parse_json(data):
-        """Returns parsed JSON content.
-        """
-
-        try:
-            return loads(data)
-        except Exception:
-            return None
+    DATA_TYPES = {
+        # palceholder   convertion
+        r"decimal":     Decimal,
+        r"string":      str,
+        r"text":        str,
+        r"integer":     int,
+        r"ascii":       str,
+        r"bytes":       bytes,
+        r"percentage":  float,
+        r"boolean":     bool,
+    }

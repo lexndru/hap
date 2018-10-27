@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import Tuple
+
 from os import path, makedirs
-from urlparse import urlparse
+from urllib.parse import urlparse
 from re import sub
 
 
@@ -35,7 +37,7 @@ class Cache(object):
     directory = ".cache"
 
     @classmethod
-    def get_file(cls, link):
+    def get_file(cls, link: str) -> str:
         """Make link ASCII friendly.
 
         Args:
@@ -54,7 +56,7 @@ class Cache(object):
         return cache_file.strip("_")
 
     @classmethod
-    def read(cls, cache):
+    def read(cls, cache: str) -> Tuple[bool, str]:
         """Read content from cache if exists.
 
         Args:
@@ -76,7 +78,7 @@ class Cache(object):
         return False, "no cache to read"
 
     @classmethod
-    def write(cls, cache_path, cache):
+    def write(cls, cache_path: str, cache: str) -> Tuple[bool, str]:
         """Write content to cache file.
 
         Args:
@@ -102,7 +104,7 @@ class Cache(object):
         return False, "no cache to write"
 
     @classmethod
-    def read_link(cls, link):
+    def read_link(cls, link: str) -> Tuple[bool, str]:
         """Read cache by link if exists.
 
         Args:
@@ -116,7 +118,7 @@ class Cache(object):
         return cls.read(cache_file)
 
     @classmethod
-    def write_link(cls, link, data):
+    def write_link(cls, link: str, data: str) -> Tuple[bool, str]:
         """Write cache by link.
 
         Args:
@@ -131,7 +133,7 @@ class Cache(object):
         return cls.write(cache_filename, data)
 
     @classmethod
-    def file_friendly(cls, string):
+    def file_friendly(cls, string: str) -> str:
         """Replace non-alphanumeric characters with an underscore.
 
         Args:
@@ -144,7 +146,7 @@ class Cache(object):
         return sub(r"[\W]", "_", string)
 
     @classmethod
-    def file_path(cls, filename):
+    def file_path(cls, filename: str) -> str:
         """Joins cache filename with cache directory.
 
         Args:

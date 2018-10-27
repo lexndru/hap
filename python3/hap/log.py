@@ -20,34 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from json import loads
+import logging
 
 
-class FileReader(object):
-    """Input file reader wrapper.
+class Log(object):
+    """Log wrapper. That's it...
     """
 
-    def __init__(self, filepath):
-        if not isinstance(filepath, (str, unicode)):
-            raise Exception("Filepath must be string")
-        self.filepath = filepath
+    config = {
+        r"format": r"%(asctime)-15s %(message)s"
+    }
 
-    def read(self):
-        """Returns content of filepath.
-        """
+    @classmethod
+    def configure(cls, verbose=False):
+        cls.config["level"] = logging.DEBUG if verbose else logging.INFO
+        logging.basicConfig(**cls.config)
 
-        try:
-            with open(self.filepath, "r") as f:
-                return True, FileReader.parse_json(f.read())
-        except Exception as e:
-            return False, str(e)
+    @classmethod
+    def info(cls, message: str):
+        logging.info(message)
 
-    @staticmethod
-    def parse_json(data):
-        """Returns parsed JSON content.
-        """
+    @classmethod
+    def debug(cls, message: str):
+        logging.debug(message)
 
-        try:
-            return loads(data)
-        except Exception:
-            return None
+    @classmethod
+    def warn(cls, message: str):
+        logging.warning(message)
+
+    @classmethod
+    def error(cls, message: str):
+        logging.error(message)
+
+    @classmethod
+    def fatal(cls, message: str):
+        cls.error(message)
+        raise SystemExit(message)

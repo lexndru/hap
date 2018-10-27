@@ -20,34 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from json import loads
+from typing import Tuple
+
+from hap.util import print_json
 
 
-class FileReader(object):
-    """Input file reader wrapper.
+class FileWriter(object):
+    """Output file writer wrapper.
     """
 
-    def __init__(self, filepath):
-        if not isinstance(filepath, (str, unicode)):
+    def __init__(self, filepath: str):
+        if not isinstance(filepath, str):
             raise Exception("Filepath must be string")
         self.filepath = filepath
 
-    def read(self):
-        """Returns content of filepath.
+    def write(self, data: dict) -> Tuple[bool, str]:
+        """Write provided content data to filepath.
         """
 
         try:
-            with open(self.filepath, "r") as f:
-                return True, FileReader.parse_json(f.read())
+            with open(self.filepath, "w") as f:
+                content = print_json(data, True)
+                f.write(content)
+                return True, "ok"
         except Exception as e:
             return False, str(e)
-
-    @staticmethod
-    def parse_json(data):
-        """Returns parsed JSON content.
-        """
-
-        try:
-            return loads(data)
-        except Exception:
-            return None

@@ -31,7 +31,7 @@ class TestCache(TestCase):
 
     def test_get_file(self):
         filename = "github_com_lexndru_hap"
-        cache_file = Cache.get_file(u"http://github.com/lexndru/hap")
+        cache_file = Cache.get_file("http://github.com/lexndru/hap")
         self.assertEqual(cache_file, filename)
 
     def test_file_friendly(self):

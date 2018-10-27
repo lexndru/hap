@@ -20,34 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from json import loads
+from hap.bootstrap import main
 
 
-class FileReader(object):
-    """Input file reader wrapper.
-    """
-
-    def __init__(self, filepath):
-        if not isinstance(filepath, (str, unicode)):
-            raise Exception("Filepath must be string")
-        self.filepath = filepath
-
-    def read(self):
-        """Returns content of filepath.
-        """
-
-        try:
-            with open(self.filepath, "r") as f:
-                return True, FileReader.parse_json(f.read())
-        except Exception as e:
-            return False, str(e)
-
-    @staticmethod
-    def parse_json(data):
-        """Returns parsed JSON content.
-        """
-
-        try:
-            return loads(data)
-        except Exception:
-            return None
+if __name__ == "__main__":
+    main()
