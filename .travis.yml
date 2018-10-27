@@ -13,7 +13,8 @@ matrix:
         - pip install flake8
 
       script:
-        - make && sudo make install-py2
+        - make lint-py2 && make test-py2
+        - sudo make install-py2
         - hap examples/sample.json --verbose --no-cache
         - hap examples/pattern.json --verbose --no-cache
 
@@ -29,6 +30,7 @@ matrix:
         - pip install flake8
 
       script:
-        - make && sudo make install-py3
+        - make lint-py3 && make test-py3
+        - sudo make install-py3
         - hap examples/sample.json --verbose --no-cache
         - hap examples/pattern.json --verbose --no-cache
