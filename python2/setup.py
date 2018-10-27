@@ -32,7 +32,7 @@ setup(name="hap",
     author_email="alex@codeissues.net",
     license="MIT",
     url="https://github.com/lexndru/hap",
-    download_url="https://github.com/lexndru/hap/archive/v{}.tar.gz".format(__version__),
+    download_url="https://github.com/lexndru/hap",
     keywords=["html", "scraping", "crawler", "tool", "hap"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",

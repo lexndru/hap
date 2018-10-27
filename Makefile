@@ -27,12 +27,23 @@ JAVA_SRC=java
 GO_SRC=go
 
 .PHONY: all clean-py2 build-py2 lint-py2 test-py2 install-py2 release-py2 \
-			clean-py3 build-py3 lint-py3 test-py3 install-py3 release-py3
+			clean-py3 build-py3 lint-py3 test-py3 install-py3 release-py3 \
+			build-py2-docker test-py2-sandbox build-py3-docker test-py3-sandbox
 
 all: init clean-py2 lint-py2 test-py2 clean-py3 lint-py3 test-py3
 
 init:
 	@chmod +x -R bin/
+
+build-py2-docker:
+	@echo "Creating docker image for Python2.x ..."
+	@cd $(PY2_SRC) && docker build -t $(APP_DIR)-$(PY2_SRC) .
+	@echo "Done"
+
+test-py2-sandbox:
+	@echo "Opening application in a sandbox environment for Python2.x ..."
+	@cd $(PY2_SRC) && docker run -it --rm --name $(APP_DIR) $(APP_DIR)-$(PY2_SRC) sh
+	@echo "Closing"
 
 build-py2: lint-py2 test-py2
 	@echo "Creating temporary build directory for Python2.x ..."
@@ -45,9 +56,9 @@ clean-py2:
 	@cd $(PY2_SRC) && find . -regextype posix-extended -regex ".*.pyc" -type f -delete
 	@echo "Done"
 
-release-py2: build
+release-py2: build-py2
 	@echo "Creating Python2.x release distribution ..."
-	@cd /tmp/$(APP_DIR)/$(APP_DIR) && python setup.py sdist
+	@cd /tmp/$(APP_DIR)/$(PY2_SRC) && python setup.py sdist
 	@echo "Done"
 
 lint-py2:
@@ -60,10 +71,20 @@ test-py2:
 	@cd $(PY2_SRC) && python -m unittest discover -v tests
 	@echo "Done"
 
-install-py2:
+install-py2: lint-py2 test-py2
 	@echo "Installing Python2.x from current sources ..."
 	@cd $(PY2_SRC) && python setup.py install
 	@echo "Done"
+
+build-py3-docker:
+	@echo "Creating docker image for Python3.x ..."
+	@cd $(PY3_SRC) && docker build -t $(APP_DIR)-$(PY3_SRC) .
+	@echo "Done"
+
+test-py3-sandbox:
+	@echo "Opening application in a sandbox environment for Python3.x ..."
+	@cd $(PY3_SRC) && docker run -it --rm --name $(APP_DIR) $(APP_DIR)-$(PY3_SRC) sh
+	@echo "Closing"
 
 build-py3: lint-py3 test-py3
 	@echo "Creating temporary build directory for Python3.x ..."
@@ -76,9 +97,9 @@ clean-py3:
 	@cd $(PY3_SRC) && find . -regextype posix-extended -regex ".*.pyc" -type f -delete
 	@echo "Done"
 
-release-py3: build
+release-py3: build-py3
 	@echo "Creating Python3.x release distribution ..."
-	@cd /tmp/$(APP_DIR)/$(APP_DIR) && python3 setup.py sdist
+	@cd /tmp/$(APP_DIR)/$(PY3_SRC) && python3 setup.py sdist
 	@echo "Done"
 
 lint-py3:
@@ -91,7 +112,7 @@ test-py3:
 	@cd $(PY3_SRC) && python3 -m unittest discover -v tests
 	@echo "Done"
 
-install-py3:
+install-py3: lint-py3 test-py3
 	@echo "Installing Python3.x from current sources ..."
 	@cd $(PY3_SRC) && python3 setup.py install
 	@echo "Done"

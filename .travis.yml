@@ -14,7 +14,7 @@ matrix:
       install:
         - pip install -r python2/requirements.txt
         - pip install flake8
-        - pip install -U pip setuptools
+        - pip install -U setuptools
 
       before_script:
         - cd python2
@@ -37,7 +37,7 @@ matrix:
       install:
         - pip install -r python3/requirements.txt
         - pip install flake8
-        - pip install -U pip setuptools
+        - pip install -U setuptools
 
       before_script:
         - cd python3
