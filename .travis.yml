@@ -21,6 +21,7 @@ matrix:
         - flake8 hap
         - python -m unittest discover -v tests
         - python setup.py install
+        - cd ..
 
       script:
         - hap examples/sample.json --verbose --no-cache
@@ -43,6 +44,7 @@ matrix:
         - flake8 hap
         - python -m unittest discover -v tests
         - python setup.py install
+        - cd ..
 
       script:
         - hap examples/sample.json --verbose --no-cache
