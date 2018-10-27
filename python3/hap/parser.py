@@ -62,8 +62,8 @@ class HTMLParser(object):
         (Field.DECLARE, True,   dict),
     )
 
-    def __init__(self, dataplan: dict=None, no_cache: bool=False,
-                 refresh: bool=False):
+    def __init__(self, dataplan: dict = None, no_cache: bool = False,
+                 refresh: bool = False):
         if not isinstance(dataplan, dict):
             raise Exception("Unexpected dataplan received: required dict")
         self.dataplan = dataplan
@@ -241,9 +241,10 @@ class HTMLParser(object):
                 return True, var
         return False, string
 
-    def perform(self, query: str=None, query_css: str=None,
-                query_xpath: str=None, pattern: str=None, remove: str=None,
-                glue: list=None, replace: list=None) -> Any:
+    def perform(self, query: str = None, query_css: str = None,
+                query_xpath: str = None, pattern: str = None,
+                remove: str = None, glue: list = None,
+                replace: list = None) -> Any:
         """Perfomer dispatcher.
 
         Args:
@@ -287,7 +288,8 @@ class HTMLParser(object):
                         self.def_key, replace, self.last_result))
         return self.last_result
 
-    def perform_query(self, query: str, xpath: bool=False) -> Union[str, None]:
+    def perform_query(self, query: str,
+                      xpath: bool = False) -> Union[str, None]:
         """Evaluate a CSS selector or a XPath expression.
 
         Args:
@@ -368,7 +370,7 @@ class HTMLParser(object):
             remove = var
         return sub(remove, "", self.last_result)
 
-    def perform_glue(self, glue: list, sep: str="") -> Union[str, None]:
+    def perform_glue(self, glue: list, sep: str = "") -> Union[str, None]:
         """Concatenate all strings from a list.
 
         Args:

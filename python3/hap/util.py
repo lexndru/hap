@@ -44,7 +44,7 @@ class DecimalEncoder(JSONEncoder):
         return super(DecimalEncoder, self).default(o)
 
 
-def print_json(data: dict, retval: bool=False) -> Union[str, None]:
+def print_json(data: dict, retval: bool = False) -> Union[str, None]:
     """Outputs pretty formatted JSON.
 
     If retval is set to True, it returns output instead of printing.
