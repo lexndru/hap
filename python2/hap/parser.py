@@ -457,7 +457,8 @@ class HTMLParser(object):
                 Log.debug(u"Getting content from cache: {}".format(link))
                 return self.prepare_source_code_from_cache(cache)
             Log.debug(u"Getting content from URL: {}".format(link))
-            return self.open_url().prepare_source_code()
+            self.open_url()
+            return self.prepare_source_code()
         Log.fatal(u"Unsupported link protocol: must be file or http(s)")
 
     def prepare_source_code_from_cache(self, cache_src):
@@ -475,7 +476,7 @@ class HTMLParser(object):
         """
 
         if self.source is None:
-            Log.warn("Source code not completed!")
+            Log.fatal("Source code not completed!")
         self.source_code = html.fromstring(self.source)
         return self
 
@@ -491,7 +492,6 @@ class HTMLParser(object):
         status, source = self.read_url(self.link)
         if not status:
             Log.fatal(u"Cannot reach link: {}".format(source))
-            return self
         if status and not str(source.code).startswith("2"):
             Log.warn(u"Non-2xx status code: {}".format(source.code))
         if hasattr(source.info(), "gettype"):

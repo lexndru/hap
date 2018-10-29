@@ -1,0 +1,33 @@
+{
+  "name": "hap-js",
+  "version": "1.2.4",
+  "description": "Hap! HTML parser for Node.js",
+  "main": "hap.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "standard && echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alexandru Catrina",
+  "license": "MIT",
+  "keywords": [
+    "hap",
+    "cli",
+    "html",
+    "scraper",
+    "parser"
+  ],
+  "repository": "github:lexndru/hap",
+  "homepage": "https://github.com/lexndru/hap",
+  "dependencies": {
+    "argparse": "^1.0.10",
+    "decimal.js": "^10.0.1",
+    "jsdom": "^12.2.0",
+    "request": "^2.88.0",
+    "xpath-to-css": "^1.0.2"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}

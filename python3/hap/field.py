@@ -23,6 +23,13 @@
 from decimal import Decimal
 
 
+def bytez(value):
+    """Helper function to cast to bytes in Python3
+    """
+
+    return bytes(value, "utf8")
+
+
 class Field(object):
     """Supported fields instances for dataplans.
     """
@@ -39,7 +46,7 @@ class Field(object):
         r"text":        str,
         r"integer":     int,
         r"ascii":       str,
-        r"bytes":       bytes,
+        r"bytes":       bytez,
         r"percentage":  float,
         r"boolean":     bool,
     }
