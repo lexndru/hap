@@ -25,6 +25,7 @@ from typing import Tuple
 from os import path, makedirs
 from urllib.parse import urlparse
 from re import sub
+from time import time
 
 
 class Cache(object):
@@ -35,6 +36,7 @@ class Cache(object):
     """
 
     directory = ".cache"
+    cache_ttl = 60 * 60  # 1 hour in seconds
 
     @classmethod
     def get_file(cls, link: str) -> str:
@@ -66,9 +68,13 @@ class Cache(object):
             tuple: Boolean for success read and string for content or error.
         """
 
-        if cache and path.exists(cls.file_path(cache)):
+        filepath = cls.file_path(cache)
+        if cache and path.exists(filepath):
+            last_mtime = path.getmtime(filepath)
+            if time() - last_mtime > cls.cache_ttl:
+                return False, "cache has expired since {}".format(last_mtime)
             try:
-                with open(cls.file_path(cache), "r") as f:
+                with open(filepath, "r") as f:
                     data = f.read()
                     if len(data) == 0:
                         return False, "empty file"

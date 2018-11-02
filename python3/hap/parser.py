@@ -461,10 +461,11 @@ class HTMLParser(object):
             return self.prepare_source_code_from_cache(content)
         elif link.startswith(self.HTTP_PROTOCOL) \
                 or link.startswith(self.HTTPS_PROTOCOL):
-            ok, cache = Cache.read_link(self.link)
-            if not self.no_cache and ok:
-                Log.debug("Getting content from cache: {}".format(link))
-                return self.prepare_source_code_from_cache(cache)
+            if not self.no_cache:
+                ok, cache = Cache.read_link(self.link)
+                if ok:
+                    Log.debug("Getting content from cache: {}".format(link))
+                    return self.prepare_source_code_from_cache(cache)
             Log.debug("Getting content from URL: {}".format(link))
             self.open_url()
             return self.prepare_source_code()

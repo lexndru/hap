@@ -1,35 +1,38 @@
-/*
- * Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+//
+// Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 const url = require('url')
 const file = require('fs')
 const path = require('path')
 
-module.exports = class Cache {
-
-  static get DIRECTORY() {
+class Cache {
+  static get DIRECTORY () {
     return '.cache'
   }
 
-  static getFile(link) {
+  static get CACHE_TTL () {
+    return 60 * 60 * 1000 // 1 hour in milliseconds
+  }
+
+  static getFile (link) {
     let cacheFile = ''
     let parsedURL = url.parse(link)
     if (parsedURL.hostname) {
@@ -41,23 +44,27 @@ module.exports = class Cache {
     return cacheFile.trim('_')
   }
 
-  static read(cacheFilepath) {
+  static read (cacheFilepath) {
     let abspath = path.join(Cache.DIRECTORY, cacheFilepath)
     if (!file.existsSync(abspath)) {
       throw new Error(`No cache to read`)
     }
+    let currentTime = new Date().getTime()
+    if (currentTime - file.statSync(abspath).mtime.getTime() > this.CACHE_TTL) {
+      throw new Error(`Cache has expired`)
+    }
     let content = file.readFileSync(abspath)
-    if (content.length == 0) {
+    if (content.length === 0) {
       throw new Error(`Empty file`)
     }
     return content
   }
 
-  static write(cacheFilepath, content) {
-    if (cacheFilepath.length == 0) {
+  static write (cacheFilepath, content) {
+    if (cacheFilepath.length === 0) {
       throw new Error(`Missing cache path`)
     }
-    if (content.length == 0) {
+    if (content.length === 0) {
       throw new Error(`Missing cache data`)
     }
     if (!file.existsSync(Cache.DIRECTORY)) {
@@ -69,16 +76,17 @@ module.exports = class Cache {
     file.writeFileSync(abspath, content)
   }
 
-  static readLink(link) {
+  static readLink (link) {
     return Cache.read(Cache.getFile(link))
   }
 
-  static writeLink(link, data) {
+  static writeLink (link, data) {
     Cache.write(Cache.getFile(link), data)
   }
 
-  static friendlyFile(filepath) {
+  static friendlyFile (filepath) {
     return filepath.replace(/[\W]/g, '_')
   }
-
 }
+
+module.exports = Cache

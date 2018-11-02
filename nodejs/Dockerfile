@@ -66,4 +66,12 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
   && apk del .build-deps-yarn
 
-CMD ["node"]
+RUN mkdir -p /opt
+
+COPY . /opt
+
+WORKDIR /opt
+
+RUN npm install && npm run lint && npm test
+
+CMD ["hap", "--version"]

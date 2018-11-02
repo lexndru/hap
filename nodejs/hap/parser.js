@@ -1,24 +1,24 @@
-/*
- * Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+//
+// Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 const file = require('fs')
 const path = require('path')
 
@@ -29,7 +29,6 @@ const Field = require(path.join(__dirname, 'field'))
 const { Type } = require(path.join(__dirname, 'utils'))
 
 const HttpRequest = require('request')
-const XPathToCSS = require('xpath-to-css')
 
 const { JSDOM } = require('jsdom')
 
@@ -39,39 +38,38 @@ const { JSDOM } = require('jsdom')
  * The source is actually the HTML source of a page and the list of entities
  * are defined by a JSON-like schema.
  */
-module.exports = class HTMLParser {
-
-  get VARIABLE_PREFIX() {
+class HTMLParser {
+  get VARIABLE_PREFIX () {
     return ':'
   }
 
-  get SUPPORTED_MIME_TYPES() {
+  get SUPPORTED_MIME_TYPES () {
     return ['text/html', 'application/xhtml+xml']
   }
 
-  get FILE_PROTOCOL() {
+  get FILE_PROTOCOL () {
     return 'file://'
   }
 
-  get HTTP_PROTOCOL() {
+  get HTTP_PROTOCOL () {
     return 'http://'
   }
 
-  get HTTPS_PROTOCOL() {
+  get HTTPS_PROTOCOL () {
     return 'https://'
   }
 
-  get SECTIONS() {
+  get SECTIONS () {
     return [
-      [Field.META,    false,  Type.isObject],
-      [Field.CONFIG,  false,  Type.isObject],
-      [Field.LINK,    true,   Type.isString],
-      [Field.DEFINE,  true,   Type.isArray ],
-      [Field.DECLARE, true,   Type.isObject],
+      { section: Field.META, required: false, datatype: Type.isObject },
+      { section: Field.CONFIG, required: false, datatype: Type.isObject },
+      { section: Field.LINK, required: true, datatype: Type.isString },
+      { section: Field.DEFINE, required: true, datatype: Type.isArray },
+      { section: Field.DECLARE, required: true, datatype: Type.isObject }
     ]
   }
 
-  constructor(dataplan, useCache, refreshRecords) {
+  constructor (dataplan, dontCache = false, refreshRecords = false) {
     if (!Type.isObject(dataplan)) {
       throw new Error('Unexpected dataplan received: required object')
     }
@@ -82,35 +80,35 @@ module.exports = class HTMLParser {
     this.link = dataplan.link
     this.data = new Map()
     this.records = new Map()
-    this.headers = new Object()
+    this.headers = {}
     this.dataplan = dataplan
-    this.useCache = useCache || false
-    this.refreshRecords = refreshRecords || false
-    Log.info("HTML Parser initialized")
+    this.dontCache = dontCache
+    this.refreshRecords = refreshRecords
+    Log.info(`HTML Parser initialized`)
   }
 
   /*
   * Run parser across all sections.
   */
-  run() {
+  run () {
     let records = this.dataplan.records
     if (Type.isArray(records) && records.length > 0) {
       Log.info(`Found ${records.length} stored record(s) in dataplan`)
     }
     if (this.refreshRecords && this.dataplan.hasOwnProperty('records')) {
-      delete this.dataplan.records;
-      Log.info("Cleaning stored records in dataplan...")
+      delete this.dataplan.records
+      Log.info(`Cleaning stored records in dataplan...`)
     }
-    for (let [section, required, datatype] of this.SECTIONS) {
+    for (let { section, required, datatype } of this.SECTIONS) {
       if (!this.dataplan.hasOwnProperty(section)) {
         if (!required) {
           continue
         }
-        Log.fatal(`Missing required section "${section}"`)
+        Log.fatal(`Missing required section '${section}'`)
       } else {
         let data = this.dataplan[section]
         if (!datatype(data)) {
-          Log.fatal(`Wrong type: section "${section}" must be ${datatype}`)
+          Log.fatal(`Wrong type: section '${section}' must be ${datatype}`)
         }
         if (section === Field.META) {
           this.prepareMeta(data)
@@ -123,17 +121,17 @@ module.exports = class HTMLParser {
         } else if (section === Field.DECLARE) {
           this.prepareDeclare(data)
         } else {
-          Log.fatal(`Unsupported section "${section}"`)
+          Log.fatal(`Unsupported section '${section}'`)
         }
       }
     }
-    Log.info("Logging records datatime...")
-    this.records.set("_datetime", new Date().toUTCString())
-    Log.info("Done")
+    Log.info(`Logging records datatime...`)
+    this.records.set('_datetime', new Date().toUTCString())
+    Log.info(`Done`)
     return this
   }
 
-  getDataplan() {
+  getDataplan () {
     let records = this.dataplan.records || []
 
     records.push(this.records)
@@ -142,11 +140,15 @@ module.exports = class HTMLParser {
     return this.dataplan
   }
 
-  getRecords() {
-    return this.records
+  getRecords () {
+    let records = {}
+    for (let [k, v] of this.records) {
+      records[k] = v
+    }
+    return records
   }
 
-  prepareDeclare(declarations) {
+  prepareDeclare (declarations) {
     for (let key of Object.keys(declarations)) {
       if (this.data.has(key)) {
         let datatype = declarations[key]
@@ -160,14 +162,14 @@ module.exports = class HTMLParser {
           }
         }
         this.records.set(key, value)
-        Log.debug(`Updating records with "${key}" as "${value}" (${datatype})`)
+        Log.debug(`Updating records with '${key}' as '${value}' (${datatype})`)
       } else {
-        Log.warn(`No data found for key "${key}"`)
+        Log.warn(`No data found for key '${key}'`)
       }
     }
   }
 
-  prepareDefine(definitions) {
+  prepareDefine (definitions) {
     for (let definition of definitions) {
       if (Type.isObject(definition) && Object.keys(definition).length > 0) {
         this.parseDefinition(definition)
@@ -175,14 +177,14 @@ module.exports = class HTMLParser {
     }
   }
 
-  parseDefinition(definition) {
+  parseDefinition (definition) {
     let keys = Object.keys(definition)
-    if (keys.length != 1) {
+    if (keys.length !== 1) {
       Log.warn(`Incorrect definition entry: expected one key, got ${keys.length} ...`)
     }
     try {
       this.defKey = keys.pop()
-      Log.debug(`Parsing definition for "${this.defKey}"`)
+      Log.debug(`Parsing definition for '${this.defKey}'`)
       let value = this.evaluateDefinitionValue(definition[this.defKey])
       this.keepFirstNonEmpty(this.defKey, value)
     } catch (e) {
@@ -190,7 +192,7 @@ module.exports = class HTMLParser {
     }
   }
 
-  keepFirstNonEmpty(key, value) {
+  keepFirstNonEmpty (key, value) {
     if (value && value.toString().length > 0) {
       if (!this.data.hasOwnProperty(key) || !this.data[key]) {
         this.data.set(key, value)
@@ -198,7 +200,7 @@ module.exports = class HTMLParser {
     }
   }
 
-  evaluateDefinitionValue(value) {
+  evaluateDefinitionValue (value) {
     this.lastResult = null
     if (Type.isString(value)) {
       this.lastResult = value
@@ -206,7 +208,7 @@ module.exports = class HTMLParser {
     } else if (Type.isObject(value)) {
       this.lastResult = this.perform(value)
     } else if (Type.isArray(value)) {
-      let actions = new Array()
+      let actions = []
       for (let step of value) {
         if (Type.isObject(step)) {
           actions.push(this.perform(step))
@@ -219,7 +221,7 @@ module.exports = class HTMLParser {
     return this.lastResult
   }
 
-  getVariableOrValue(string) {
+  getVariableOrValue (string) {
     if (string.startsWith(this.VARIABLE_PREFIX)) {
       let holder = string.substring(this.VARIABLE_PREFIX.length)
       if (this.data.has(holder) && this.data.get(holder) != null) {
@@ -229,7 +231,7 @@ module.exports = class HTMLParser {
     return string
   }
 
-  perform({
+  perform ({
     query: query = null,
     query_css: queryCSS = null,
     query_xpath: queryXPath = null,
@@ -243,34 +245,39 @@ module.exports = class HTMLParser {
     }
     if (queryCSS != null) {
       this.lastResult = this.performQuery(queryCSS)
-      Log.debug(`Performing ${this.defKey}:query:css "${queryCSS}" => ${this.lastResult}`)
+      Log.debug(`Performing ${this.defKey}:query:css '${queryCSS}' => ${this.lastResult}`)
     } else if (queryXPath != null) {
       this.lastResult = this.performQuery(queryXPath, true)
-      Log.debug(`Performing ${this.defKey}:query:xpath "${queryXPath}" => ${this.lastResult}`)
+      Log.debug(`Performing ${this.defKey}:query:xpath '${queryXPath}' => ${this.lastResult}`)
     } else if (pattern != null) {
       this.lastResult = this.performPattern(pattern)
-      Log.debug(`Performing ${this.defKey}:pattern "${pattern}" => ${this.lastResult}`)
+      Log.debug(`Performing ${this.defKey}:pattern '${pattern}' => ${this.lastResult}`)
     } else if (replace != null) {
       this.lastResult = this.performReplace(replace)
-      Log.debug(`Performing ${this.defKey}:replace "${replace}" => ${this.lastResult}`)
+      Log.debug(`Performing ${this.defKey}:replace '${replace}' => ${this.lastResult}`)
     } else if (remove != null) {
       this.lastResult = this.performRemove(remove)
-      Log.debug(`Performing ${this.defKey}:remove "${remove}" => ${this.lastResult}`)
+      Log.debug(`Performing ${this.defKey}:remove '${remove}' => ${this.lastResult}`)
     } else if (glue != null) {
       this.lastResult = this.performGlue(glue)
-      Log.debug(`Performing ${this.defKey}:glue "${glue}" => ${this.lastResult}`)
+      Log.debug(`Performing ${this.defKey}:glue '${glue}' => ${this.lastResult}`)
     }
     return this.lastResult
   }
 
-  performQuery(query, xpath = false) {
+  performQuery (query, xpath = false) {
+    let data
     if (xpath) {
-      query = XPathToCSS(query)
+      let nodeType = this.sourceCode.window.XPathResult.FIRST_ORDERED_NODE_TYPE
+      let doc = this.sourceCode.window.document
+      let xml = doc.evaluate(query, doc.body, null, nodeType, null)
+      data = xml.singleNodeValue
+    } else {
+      data = this.sourceCode.window.document.querySelector(query)
     }
     let lastResult = (data) => {
       return data.textContent.trim()
     }
-    let data = this.sourceCode.window.document.querySelector(query)
     if (data == null) {
       return this.lastResult
     }
@@ -287,31 +294,33 @@ module.exports = class HTMLParser {
   /*
    * Does not have support for named groups
    */
-  performPattern(pattern) {
+  performPattern (pattern) {
     if (!Type.isString(pattern)) {
       return this.lastResult
     }
-    let newPattern = new Array()
-    for (let word of pattern.split(' ')) {
-      newPattern.push(this.getVariableOrValue(word))
-    }
-    pattern = newPattern.join(' ')
-    let regex = new RegExp(pattern, 'g')
-    let results = this.lastResult.match(regex)
-    if (results.length > 0) {
-      return results.shift()
+    if (this.lastResult != null) {
+      let newPattern = []
+      for (let word of pattern.split(' ')) {
+        newPattern.push(this.getVariableOrValue(word))
+      }
+      pattern = newPattern.join(' ')
+      let regex = new RegExp(pattern, 'g')
+      let results = regex.exec(this.lastResult)
+      if (results.length > 1) {
+        return results[1]
+      }
     }
     return this.lastResult
   }
 
-  performReplace(replace) {
+  performReplace (replace) {
     let [oldString, newString] = replace
     if (!Type.isString(this.lastResult)) {
       return this.lastResult
     }
     let getValue = (value) => {
       let variable = this.getVariableOrValue(value)
-      if (Type.isString(variable) && variable != value) {
+      if (Type.isString(variable) && variable !== value) {
         return variable
       }
       return value
@@ -319,18 +328,18 @@ module.exports = class HTMLParser {
     return this.lastResult.replace(getValue(oldString), getValue(newString))
   }
 
-  performRemove(remove) {
+  performRemove (remove) {
     if (!Type.isString(this.lastResult)) {
       return this.lastResult
     }
     let removeVar = this.getVariableOrValue(remove)
-    if (Type.isString(removeVar) && removeVar != remove) {
+    if (Type.isString(removeVar) && removeVar !== remove) {
       remove = removeVar
     }
-    return this.lastResult.replace(remove, '')
+    return this.lastResult.replace(new RegExp(remove, 'g'), '')
   }
 
-  performGlue(glue, separator = '') {
+  performGlue (glue, separator = '') {
     if (Type.isString(glue)) {
       separator = ' '
       glue = glue.split(separator)
@@ -338,14 +347,14 @@ module.exports = class HTMLParser {
     if (!Type.isArray(glue)) {
       return this.lastResult
     }
-    let items = new Array()
-    for (let each in glue) {
+    let items = []
+    for (let each of glue) {
       items.push(this.getVariableOrValue(each))
     }
     return items.join(separator)
   }
 
-  prepareConfig(configuration) {
+  prepareConfig (configuration) {
     for (let key in configuration) {
       if (key === Field.HEADERS && Type.isObject(configuration[key])) {
         this.headers = configuration[key]
@@ -353,7 +362,7 @@ module.exports = class HTMLParser {
     }
   }
 
-  prepareMeta(metafields) {
+  prepareMeta (metafields) {
     if (Type.isObject(metafields) && Object.keys(metafields).length > 0) {
       Log.debug(`Listing meta fields`)
       for (let key in metafields) {
@@ -362,37 +371,23 @@ module.exports = class HTMLParser {
     }
   }
 
-  prepareLink(link) {
-    if (link.startsWith(this.FILE_PROTOCOL)) {
-      let filepath = link.substring(this.FILE_PROTOCOL.length)
-      if (!file.existsSync(filepath)) {
-        Log.fatal(`Cannot get content from file: file does not exist`)
-      }
-      Log.debug(`Getting content from local file: ${link}`)
-      this.prepareSourceCodeFromCache(file.readFileSync(filepath))
-    } else if (link.startsWith(this.HTTP_PROTOCOL) || link.startsWith(this.HTTPS_PROTOCOL)) {
-      if (this.useCache) {
-        try {
-          let cachedContent = Cache.readLink(link)
-          Log.debug(`Getting content from cache: ${link}`)
-          this.prepareSourceCodeFromCache(cachedContent)
-          return  // early exit
-        } catch (e) {
-          Log.warn(`Requested read from cache, but cannot get content...`)
-        }
-      }
-      this.prepareSourceCode()
-    } else {
-      Log.fatal(`Unsupported link protocol: must be file or http(s)`)
+  prepareLink (link) {
+    if (link.toString().length === 0) {
+      Log.fatal(`Unexpected empty link`)
+    }
+    if (!link.startsWith(this.FILE_PROTOCOL) &&
+        !link.startsWith(this.HTTP_PROTOCOL) &&
+        !link.startsWith(this.HTTPS_PROTOCOL)) {
+      Log.fatal(`Unsupported link protocol`)
     }
   }
 
-  prepareSourceCodeFromCache(content) {
+  prepareSourceCodeFromCache (content) {
     this.source = content
     return this.prepareSourceCode()
   }
 
-  prepareSourceCode() {
+  prepareSourceCode () {
     if (this.source == null) {
       Log.fatal(`Source code not completed!`)
     }
@@ -400,20 +395,25 @@ module.exports = class HTMLParser {
     return this
   }
 
-  openURL() {
+  readFile () {
+    let filepath = this.link.substring(this.FILE_PROTOCOL.length)
+    if (!file.existsSync(filepath)) {
+      Log.fatal(`Cannot get content from file: file does not exist`)
+    }
+    Log.debug(`Getting content from local file: ${this.link}`)
+    this.prepareSourceCodeFromCache(file.readFileSync(filepath))
+  }
+
+  readLink () {
     return new Promise((resolve, reject) => {
-      if (this.useCache) {
-        return resolve()
-      }
       HttpRequest({
         url: this.link,
         headers: this.headers
       }, (error, resp, source) => {
         Log.debug(`Getting content from URL: ${this.link}`)
-        if (error) {
-          reject(error)
+        if (error != null) {
+          return reject(error)
         }
-
         if (!resp.statusCode.toString().startsWith('2')) {
           Log.fatal(`Non-2xx status code: ${resp.statusCode}`)
         }
@@ -432,33 +432,62 @@ module.exports = class HTMLParser {
           Log.fatal(`Unsupported content, got ${contentType}`)
         }
         this.source = source
-        try {
-          if (this.useCache) {
-            try {
-              Cache.writeLink(this.link, this.source)
-            } catch (e) {
-              Log.warn(`Failed to cache source: ${e.message}`)
-            }
+        this.prepareSourceCode()
+        if (!this.dontCache) {
+          try {
+            Cache.writeLink(this.link, this.source)
+          } catch (e) {
+            Log.warn(`Failed to cache source: ${e.message}`)
           }
-        } catch (e) {
-          Log.fatal(`Cannot reach link: ${e.message}`)
         }
-        resolve(source)
+        return resolve(source)
       })
     })
   }
 
-  fetch() {
+  readCachedLink () {
+    return new Promise((resolve, reject) => {
+      try {
+        let cachedContent = Cache.readLink(this.link)
+        Log.debug(`Getting content from cache: ${this.link}`)
+        this.prepareSourceCodeFromCache(cachedContent)
+        resolve()
+      } catch (e) {
+        Log.debug(`Cannot get content from cache: ${e.message}`)
+        this.readLink().then(() => resolve()).catch(e => reject(e))
+      }
+    })
+  }
+
+  openURL () {
+    return new Promise((resolve, reject) => {
+      if (this.link.startsWith(this.FILE_PROTOCOL)) {
+        this.readFile()
+        resolve()
+      } else if (this.link.startsWith(this.HTTP_PROTOCOL) || this.link.startsWith(this.HTTPS_PROTOCOL)) {
+        if (this.dontCache) {
+          this.readLink().then(() => resolve()).catch(e => reject(e.message))
+        } else {
+          this.readCachedLink().then(() => resolve()).catch(e => reject(e.message))
+        }
+      } else {
+        reject(new Error(`Unsupported link protocol: must be file or http(s)`))
+      }
+    })
+  }
+
+  fetch () {
     return new Promise((resolve, reject) => {
       this.openURL()
-        .then(d => {
+        .then(() => {
           this.run()
           resolve(this.getRecords(), this.getDataplan())
         })
         .catch(e => {
           reject(e.message)
         })
-    });
+    })
   }
-
 }
+
+module.exports = HTMLParser
