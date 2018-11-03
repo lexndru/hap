@@ -78,6 +78,7 @@ Optional arguments:
 
 ## Getting started with Hap!
 *Notice: The following guide is using the Python implementation of Hap!*
+
 The purpose of Hap! is to have a simple and fast way to retrieve certain data from the internet. It uses JSON formatted data as input and output. Input can be either from a local file or from stdin from another process. Output is either printed to stdout or saved to file. If input is provided by file, Hap! names it dataplan ("data planning") and the same file is used when the output is saved.
 
 ## Usage
