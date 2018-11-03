@@ -60,20 +60,20 @@ Optional arguments:
 
 
 ## Features
-[x] Scrape HTML pages from the web or locally
-[x] Quick parse and extract data from HTML documents
-[x] Convert desired output data ("declared data") to `string`, `integer`, `floats`, `decimals` or `boolean` values
-[x] Run step-by-step instructions ("defined steps") with performers to obtain the desired output
-[x] Create variables and directly or indirectly assign string values
-[x] Query CSS selectors and XPath expressions
-[x] Evaluate patterns with regular expressions
-[x] Capture and create variables from named groups (Python2/3 only)
-[x] Remove unwanted characters or patterns from an intermediate result
-[x] Replace characters or patterns with static content or dynamic content with variables
-[x] Concatenate list of strings with support for variable interpolation
-[x] Self-stored history records with `datetime` support
-[x] Configurable outgoing requests
-[x] Supports metafields
+- [x] Scrape HTML pages from the web or locally
+- [x] Quick parse and extract data from HTML documents
+- [x] Convert desired output data ("declared data") to `string`, `integer`, `floats`, `decimals` or `boolean` values
+- [x] Run step-by-step instructions ("defined steps") with performers to obtain the desired output
+- [x] Create variables and directly or indirectly assign string values
+- [x] Query CSS selectors and XPath expressions
+- [x] Evaluate patterns with regular expressions
+- [x] Capture and create variables from named groups (Python2/3 only)
+- [x] Remove unwanted characters or patterns from an intermediate result
+- [x] Replace characters or patterns with static content or dynamic content with variables
+- [x] Concatenate list of strings with support for variable interpolation
+- [x] Self-stored history records with `datetime` support
+- [x] Configurable outgoing requests
+- [x] Supports metafields
 
 
 ## Getting started with Hap!
