@@ -49,3 +49,21 @@ matrix:
       script:
         - hap examples/sample.json --verbose --no-cache
         - hap examples/pattern.json --verbose --no-cache
+
+    - language: node_js
+      node_js:
+        - "6"
+
+      git:
+        depth: 3
+
+      install:
+        - cd nodejs
+        - npm install
+        - npm run lint
+        - npm test
+        - npm install . -g
+        - cd ..
+
+      script:
+        - hap.js examples/sample.json --verbose --no-cache
