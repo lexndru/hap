@@ -28,12 +28,16 @@ GO_SRC=go
 
 .PHONY: all clean-py2 build-py2 lint-py2 test-py2 install-py2 release-py2 \
 			clean-py3 build-py3 lint-py3 test-py3 install-py3 release-py3 \
-			build-py2-docker test-py2-sandbox build-py3-docker test-py3-sandbox
+			build-py2-docker test-py2-sandbox build-py3-docker test-py3-sandbox \
+			clean-node build-node lint-node test-node install-node release-node \
+			build-node-docker test-node-sandbox
 
 all: init clean-py2 lint-py2 test-py2 clean-py3 lint-py3 test-py3
 
 init:
 	@chmod +x -R bin/
+
+################################### python 2 ###################################
 
 build-py2-docker:
 	@echo "Creating docker image for Python2.x ..."
@@ -76,6 +80,8 @@ install-py2: lint-py2 test-py2
 	@cd $(PY2_SRC) && python setup.py install
 	@echo "Done"
 
+################################### python 3 ###################################
+
 build-py3-docker:
 	@echo "Creating docker image for Python3.x ..."
 	@cd $(PY3_SRC) && docker build -t $(APP_DIR)-$(PY3_SRC) .
@@ -115,4 +121,43 @@ test-py3:
 install-py3: lint-py3 test-py3
 	@echo "Installing Python3.x from current sources ..."
 	@cd $(PY3_SRC) && python3 setup.py install
+	@echo "Done"
+
+#################################### nodejs ####################################
+
+build-node-docker:
+	@echo "Creating docker image for Node.js ..."
+	@cd $(NODE_SRC) && docker build -t $(APP_DIR)-$(NODE_SRC) .
+	@echo "Done"
+
+test-node-sandbox:
+	@echo "Opening application in a sandbox environment for Node.js ..."
+	@cd $(NODE_SRC) && docker run -it --rm --name $(APP_DIR) $(APP_DIR)-$(NODE_SRC) sh
+	@echo "Closing"
+
+build-node: lint-node test-node
+	@echo "Creating temporary build directory for Node.js ..."
+	@cd /tmp && mkdir -p $(APP_DIR) && cd $(APP_DIR)
+	@cp -R $(CWD)/$(NODE_SRC) /tmp/$(APP_DIR)
+	@echo "Done"
+
+clean-node:
+	@echo "Nothing to clean for Node.js ..."
+
+release-node: build-node
+	@echo "Nothing to release for Node.js ..."
+
+lint-node:
+	@echo "Checking Node.js sources ..."
+	@cd $(NODE_SRC) && npm run lint
+	@echo "Done"
+
+test-node:
+	@echo "Checking Node.js tests ..."
+	@cd $(NODE_SRC) && npm test
+	@echo "Done"
+
+install-node: lint-node test-node
+	@echo "Installing Node.js from current sources ..."
+	@cd $(NODE_SRC) && npm install . -g
 	@echo "Done"

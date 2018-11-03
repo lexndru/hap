@@ -3,6 +3,13 @@
   "version": "1.2.4",
   "description": "Hap! HTML parser for Node.js",
   "main": "hap.js",
+  "bin": {
+    "hap": "hap.js"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "preferGlobal": true,
   "directories": {
     "test": "tests"
   },
