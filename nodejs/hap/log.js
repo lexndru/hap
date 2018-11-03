@@ -21,7 +21,7 @@
 const { createLogger, format, transports } = require('winston')
 
 /*
- * Log wrapper. That's it...
+ * Log wrapper
  */
 class Log {
   static get VERBOSE_LEVEL () {

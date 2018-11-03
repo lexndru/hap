@@ -80,6 +80,12 @@ class Type {
   }
 }
 
+/*
+ * Helper class for ReaderWriter wrapper
+ *
+ * Used to equivalent other implementations support
+ * for tuple-like return values
+ */
 class JSONDataContent {
   constructor (hasFailed, rawContent, jsonData) {
     this._hasFailed = hasFailed

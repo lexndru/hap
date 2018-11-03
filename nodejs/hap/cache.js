@@ -22,6 +22,12 @@ const url = require('url')
 const file = require('fs')
 const path = require('path')
 
+/*
+ * HTML cache wrapper.
+ *
+ * Adds support to cache an URL's content and store it as much as the user
+ * wants. Cache files are named after the URI.
+ */
 class Cache {
   static get DIRECTORY () {
     return '.cache'

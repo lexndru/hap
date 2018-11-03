@@ -20,6 +20,9 @@
 
 const Decimal = require('decimal.js')
 
+/*
+ * Supported fields instances for dataplans.
+ */
 class Field {
   static get RECORDS () {
     return 'records'
