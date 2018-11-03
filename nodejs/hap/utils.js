@@ -1,4 +1,3 @@
-//
 // Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -161,5 +160,5 @@ class JSONDataReaderWriter {
 module.exports = {
   Type: Type,
   ReaderWriter: JSONDataReaderWriter,
-  Pretty: prettyJSON
+  pretty: prettyJSON
 }

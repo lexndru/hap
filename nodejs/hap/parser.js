@@ -1,4 +1,3 @@
-//
 // Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -134,7 +133,7 @@ class HTMLParser {
   getDataplan () {
     let records = this.dataplan.records || []
 
-    records.push(this.records)
+    records.push(this.getRecords())
     this.dataplan.records = records
 
     return this.dataplan
@@ -481,7 +480,10 @@ class HTMLParser {
       this.openURL()
         .then(() => {
           this.run()
-          resolve(this.getRecords(), this.getDataplan())
+          resolve({
+            records: this.getRecords(),
+            dataplan: this.getDataplan()
+          })
         })
         .catch(e => {
           reject(e.message)

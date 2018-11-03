@@ -1,4 +1,3 @@
-//
 // Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +22,7 @@ const path = require('path')
 
 const Log = require(path.join(__dirname, 'log'))
 const HTMLParser = require(path.join(__dirname, 'parser'))
-const { ReaderWriter, Pretty } = require(path.join(__dirname, 'utils'))
+const { ReaderWriter, pretty } = require(path.join(__dirname, 'utils'))
 const { shell, documentation } = require(path.join(__dirname, 'shell'))
 
 /*
@@ -35,6 +34,11 @@ let failfast = (...messages) => {
   }
   process.exit(1)
 }
+
+/*
+ * Pretty output
+ */
+let println = (output) => process.stdout.write(`${output}\n`)
 
 /*
  * Main Hap! bootstrap launcher
@@ -91,14 +95,14 @@ let main = (...args) => {
   let parser = new HTMLParser(dataplan, shell.noCache, shell.save && shell.refresh)
 
   // handle async parser
-  parser.fetch().then((records, dataplan) => {
+  parser.fetch().then(results => {
+    let { records, dataplan } = results
     if (shell.save) {
       ReaderWriter.toFile(shell.input, dataplan)
     }
 
     if (!shell.silent) {
-      let output = Pretty(records)
-      process.sdtout.write(output)
+      println(pretty(records))
     }
   }).catch(error => failfast(error))
 }

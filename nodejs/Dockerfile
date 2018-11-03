@@ -72,6 +72,6 @@ COPY . /opt
 
 WORKDIR /opt
 
-RUN npm install && npm run lint && npm test && npm install . -g
+RUN npm install && npm test && npm install . -g
 
 CMD ["hap", "--version"]

@@ -60,10 +60,9 @@ matrix:
       install:
         - cd nodejs
         - npm install
-        - npm run lint
         - npm test
         - npm install . -g
         - cd ..
 
       script:
-        - hap.js examples/sample.json --verbose --no-cache
+        - hap examples/sample.json --verbose --no-cache

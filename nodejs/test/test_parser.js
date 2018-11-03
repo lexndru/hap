@@ -1,4 +1,3 @@
-//
 // Copyright (c) 2018 Alexandru Catrina <alex@codeissues.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -146,7 +145,8 @@ describe('HTML Parser', () => {
       DATAPLAN_XPATH['link'] = mockupURL
       let expectedURL = 'https://github.com/lexndru/hap'
       let psr = new HTMLParser(DATAPLAN_XPATH)
-      psr.fetch().then((records, dataplan) => {
+      psr.fetch().then(results => {
+        let { records, dataplan } = results
         assert.equal(records.url, expectedURL)
       }).catch(e => {
         assert.fail(e.message)
@@ -159,7 +159,8 @@ describe('HTML Parser', () => {
       DATAPLAN_CSS['link'] = mockupURL
       let expectedText = 'Hap GitHub'
       let psr = new HTMLParser(DATAPLAN_CSS)
-      psr.fetch().then((records, dataplan) => {
+      psr.fetch().then(results => {
+        let { records, dataplan } = results
         assert.equal(records.github, expectedText)
       }).catch(e => {
         assert.fail(e.message)
@@ -172,7 +173,8 @@ describe('HTML Parser', () => {
       DATAPLAN_PATTERN['link'] = mockupURL
       let expectedText = 'cats'
       let psr = new HTMLParser(DATAPLAN_PATTERN)
-      psr.fetch().then((records, dataplan) => {
+      psr.fetch().then(results => {
+        let { records, dataplan } = results
         assert.equal(records.topic, expectedText)
       }).catch(e => {
         assert.fail(e.message)
@@ -184,7 +186,8 @@ describe('HTML Parser', () => {
     it('should extract the time and generate a new sentence', () => {
       DATAPLAN_REMOVE['link'] = mockupURL
       let psr = new HTMLParser(DATAPLAN_REMOVE)
-      psr.fetch().then((records, dataplan) => {
+      psr.fetch().then(results => {
+        let { records, dataplan } = results
         assert.equal(records.time, '12:00')
         assert.equal(records.alert, 'The time is 12:00')
       }).catch(e => {
@@ -197,9 +200,10 @@ describe('HTML Parser', () => {
     it('should extract the time and generate a new sentence', () => {
       DATAPLAN_REPLACE['link'] = mockupURL
       let psr = new HTMLParser(DATAPLAN_REPLACE)
-      psr.fetch().then((records, dataplan) => {
+      psr.fetch().then(results => {
+        let { records, dataplan } = results
         assert.equal(records.username, 'lexndru')
-        assert.equal(records.sentence, 'The is a sentence about lexndru')
+        assert.equal(records.sentence, 'This is a sentence about lexndru.')
       }).catch(e => {
         assert.fail(e.message)
       })
