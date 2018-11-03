@@ -1,4 +1,4 @@
-# Hap! for Node.js
+# Hap! for Python 3
 [![Build Status](https://travis-ci.org/lexndru/hap.svg?branch=master)](https://travis-ci.org/lexndru/hap)
 
 Hap! is an HTML parser and scraping tool build upon its own concept to transform markup-language documents into valuable data. It implements the dataplan application specification for markup-language data-oriented documents.
@@ -7,13 +7,14 @@ The complete guide for Hap! can be found on the frontpage of the github reposito
 
 
 ## Requirements
-- nodejs >= 6.x
-- npm
+- python >= 3.5
+- pip
+- libxml2
 
 
 ## Install
 ```
-$ npm install hap
+$ pip install hap
 ```
 
 ## License

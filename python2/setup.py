@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 
+import io
+
 from setuptools import setup
+from os import path
 
 from hap import __version__
 
 
-long_description = """
-Hap! is an HTML parser and scraping tool written in Python.
+long_description = "Hap! description"
 
-The purpose of Hap! is to have a simple and fast way to retrieve certain data from the internet. It uses JSON formatted data as input and output. Input can be either from a local file or from stdin from another process. Output is either printed to stdout or saved to file. If input is provided by file, Hap! names it dataplan ("data planning") and the same file is used when the output is saved.
-"""
+directory = path.abspath(path.dirname(__file__))
+with io.open(path.join(directory, "README.md"), encoding="utf-8") as fd:
+    long_description = fd.read()
+
 
 setup(name="hap",
     packages=[
@@ -28,6 +32,7 @@ setup(name="hap",
     version=__version__,
     description="A simple HTML scraping tool",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Alexandru Catrina",
     author_email="alex@codeissues.net",
     license="MIT",
