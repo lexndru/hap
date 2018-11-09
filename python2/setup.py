@@ -8,11 +8,11 @@ from os import path
 from hap import __version__
 
 
-long_description = "Hap! description"
+long_description = """
+Hap! is an HTML parser and scraping tool build upon its own concept to transform markup-language documents into valuable data. It implements the dataplan application specification for markup-language data-oriented documents.
 
-directory = path.abspath(path.dirname(__file__))
-with io.open(path.join(directory, "README.md"), encoding="utf-8") as fd:
-    long_description = fd.read()
+The complete guide for Hap! can be found on the frontpage of the github repository https://github.com/lexndru/hap
+"""
 
 
 setup(name="hap",
