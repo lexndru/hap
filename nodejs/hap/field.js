@@ -81,10 +81,13 @@ class Field {
       string: string => string.toString(),
       text: text => text.toString(),
       integer: integer => parseInt(integer, 10),
-      ascii: ascii => ascii.toString(),
-      bytes: bytes => Buffer.from(bytes, 'utf8'),
+      number: integer => parseInt(integer, 10),
       percentage: percentage => parseFloat(percentage),
-      boolean: boolean => parseBoolean(boolean)
+      float: percentage => parseFloat(percentage),
+      double: percentage => parseFloat(percentage),
+      boolean: boolean => parseBoolean(boolean),
+      base64: value => Buffer.from(value.toString()).toString('base64'),
+      bytes: bytes => Buffer.from(bytes, 'utf8'),
     }
   }
 }

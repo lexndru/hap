@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 from decimal import Decimal
+from base64 import b64encode
 
 
 def boolean(value):
@@ -40,6 +41,19 @@ def boolean(value):
     raise TypeError("Non-boolean value: '{}' ({})".format(value, value_type))
 
 
+def base64s(value):
+    """Helper function to cast to base64
+    """
+
+    if not isinstance(value, str):
+        if isinstance(value, unicode):
+            value = value.encode("utf8")
+        else:
+            value = str(value)
+
+    return b64encode(value)
+
+
 class Field(object):
     """Supported fields instances for dataplans.
     """
@@ -55,8 +69,11 @@ class Field(object):
         r"string":      unicode,
         r"text":        unicode,
         r"integer":     int,
-        r"ascii":       str,
-        r"bytes":       bytes,
+        r"number":      int,
         r"percentage":  float,
+        r"float":       float,
+        r"double":      float,
         r"boolean":     boolean,
+        r"base64":      base64s,
+        r"bytes":       bytes,
     }

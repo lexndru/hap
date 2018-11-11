@@ -1,6 +1,6 @@
 {
   "name": "hap-js",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Hap! HTML parser for Node.js",
   "main": "hap.js",
   "bin": {

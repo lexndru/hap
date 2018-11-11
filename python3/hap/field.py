@@ -21,6 +21,14 @@
 # THE SOFTWARE.
 
 from decimal import Decimal
+from base64 import b64encode
+
+
+def bytez(value):
+    """Helper function to cast to bytes in Python3
+    """
+
+    return bytes(value, "utf8")
 
 
 def boolean(value):
@@ -40,11 +48,16 @@ def boolean(value):
     raise TypeError("Non-boolean value: '{}' ({})".format(value, value_type))
 
 
-def bytez(value):
-    """Helper function to cast to bytes in Python3
+def base64s(value):
+    """Helper function to cast to base64
     """
 
-    return bytes(value, "utf8")
+    if not isinstance(value, bytes):
+        if not isinstance(value, str):
+            value = str(value)
+        value = bytez(value)
+
+    return b64encode(value)
 
 
 class Field(object):
@@ -62,8 +75,11 @@ class Field(object):
         r"string":      str,
         r"text":        str,
         r"integer":     int,
-        r"ascii":       str,
-        r"bytes":       bytez,
+        r"number":      int,
         r"percentage":  float,
+        r"float":       float,
+        r"double":      float,
         r"boolean":     boolean,
+        r"base64":      base64s,
+        r"bytes":       bytez,
     }
