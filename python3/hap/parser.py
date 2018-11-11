@@ -25,7 +25,7 @@ from typing import Tuple, Any, Union
 from collections import Callable
 
 from lxml import html
-from datetime import datetime
+from time import time
 from urllib.request import urlopen, Request
 from re import sub, compile, IGNORECASE
 from os import path
@@ -106,7 +106,7 @@ class HTMLParser(object):
             getattr(self, "prepare_{}".format(sec))(data)
 
         Log.debug("Logging records datetime...")
-        self.records["_datetime"] = str(datetime.utcnow())
+        self.records["_datetime"] = time()
         Log.debug("Done...")
         return self
 
@@ -154,6 +154,7 @@ class HTMLParser(object):
                 try:
                     value = convert_func(value)
                 except Exception as e:
+                    value = None
                     Log.warn("Cannot convert value because {}".format(e))
             self.records.update({key: value})
             args = (key, value, datatype)
@@ -302,6 +303,8 @@ class HTMLParser(object):
 
         if xpath:
             def last_result(data):
+                if not isinstance(data, str):
+                    data = str(data)
                 return data.strip()
             data = self.source_code.xpath(query)
             if isinstance(data, list):
@@ -314,9 +317,11 @@ class HTMLParser(object):
             data = self.source_code.cssselect(query)
         if data is None:
             return self.last_result
+        if isinstance(data, list):
+            if len(data) == 0:
+                return self.last_result
+            data = data.pop(0)
         try:
-            if isinstance(data, list) and len(data) > 0:
-                data = data[0]
             return last_result(data)
         except Exception:
             return self.last_result

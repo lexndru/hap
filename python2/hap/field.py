@@ -23,6 +23,23 @@
 from decimal import Decimal
 
 
+def boolean(value):
+    """Helper function to cast to boolean
+    """
+
+    if isinstance(value, bool):
+        return value
+
+    if isinstance(value, (str, unicode)):
+        if value.lower() == "true" or value.lower() == "1":
+            return True
+        elif value.lower() == "false" or value.lower() == "0":
+            return False
+
+    value_type = type(value)
+    raise TypeError("Non-boolean value: '{}' ({})".format(value, value_type))
+
+
 class Field(object):
     """Supported fields instances for dataplans.
     """
@@ -33,7 +50,7 @@ class Field(object):
     LINK, DECLARE, DEFINE = r"link", r"declare", r"define"
 
     DATA_TYPES = {
-        # palceholder   convertion
+        # placeholder   convertion
         r"decimal":     Decimal,
         r"string":      unicode,
         r"text":        unicode,
@@ -41,5 +58,5 @@ class Field(object):
         r"ascii":       str,
         r"bytes":       bytes,
         r"percentage":  float,
-        r"boolean":     bool,
+        r"boolean":     boolean,
     }

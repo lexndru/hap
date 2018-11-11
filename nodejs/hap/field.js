@@ -20,6 +20,29 @@
 
 const Decimal = require('decimal.js')
 
+const path = require('path')
+
+const { Type } = require(path.join(__dirname, 'utils'))
+
+/*
+ * Helper function to cast to boolean
+ */
+let parseBoolean = (value) => {
+  if (value === true) {
+    return true
+  } else if (value === false) {
+    return false
+  } else if (Type.isString(value)) {
+    let boolString = value.toString().toLowerCase()
+    if (boolString === 'true' || boolString === '1') {
+      return true
+    } else if (boolString === 'false' || boolString === '0') {
+      return false
+    }
+  }
+  throw new Error(`Non-boolean value: "${value}" (${typeof value})`)
+}
+
 /*
  * Supported fields instances for dataplans.
  */
@@ -61,7 +84,7 @@ class Field {
       ascii: ascii => ascii.toString(),
       bytes: bytes => Buffer.from(bytes, 'utf8'),
       percentage: percentage => parseFloat(percentage),
-      boolean: boolean => boolean === 'true'
+      boolean: boolean => parseBoolean(boolean)
     }
   }
 }

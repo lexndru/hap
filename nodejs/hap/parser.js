@@ -178,7 +178,7 @@ class HTMLParser {
       }
     }
     Log.info(`Logging records datatime...`)
-    this.records.set('_datetime', new Date().toUTCString())
+    this.records.set('_datetime', +new Date())
     Log.info(`Done`)
     return this
   }
@@ -229,6 +229,7 @@ class HTMLParser {
           try {
             value = convert(value)
           } catch (e) {
+            value = null
             Log.warn(`Cannot convert value because ${e.message}`)
           }
         }
@@ -418,15 +419,23 @@ class HTMLParser {
       data = this.sourceCode.window.document.querySelector(query)
     }
     let lastResult = (data) => {
-      return data.textContent.trim()
+      try {
+        data = data.textContent
+      } catch (e) {
+        data = data.toString()
+      }
+      return data.trim()
     }
     if (data == null) {
       return this.lastResult
     }
-    try {
-      if (Type.isArray(data) && data.length > 0) {
-        data = data.shift()
+    if (Type.isArray(data)) {
+      if (data.length == 0) {
+        return this.lastResult
       }
+      data = data.shift()
+    }
+    try {
       return lastResult(data)
     } catch (e) {
       return this.lastResult

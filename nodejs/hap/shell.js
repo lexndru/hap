@@ -21,7 +21,7 @@
 const { ArgumentParser } = require('argparse')
 
 let parser = new ArgumentParser({
-  version: '1.3.0',
+  version: '1.3.1',
   addHelp: true,
   description: 'Hap! Simple HTML scraping tool'
 })

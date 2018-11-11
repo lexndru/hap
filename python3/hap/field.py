@@ -23,6 +23,23 @@
 from decimal import Decimal
 
 
+def boolean(value):
+    """Helper function to cast to boolean
+    """
+
+    if isinstance(value, bool):
+        return value
+
+    if isinstance(value, str):
+        if value.lower() == "true" or value.lower() == "1":
+            return True
+        elif value.lower() == "false" or value.lower() == "0":
+            return False
+
+    value_type = type(value)
+    raise TypeError("Non-boolean value: '{}' ({})".format(value, value_type))
+
+
 def bytez(value):
     """Helper function to cast to bytes in Python3
     """
@@ -48,5 +65,5 @@ class Field(object):
         r"ascii":       str,
         r"bytes":       bytez,
         r"percentage":  float,
-        r"boolean":     bool,
+        r"boolean":     boolean,
     }
