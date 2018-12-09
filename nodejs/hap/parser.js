@@ -736,6 +736,9 @@ class HTMLParser {
    */
   fetch () {
     return new Promise((resolve, reject) => {
+      if (this.dataplan && this.dataplan.config) {
+        this.prepareConfig(this.dataplan.config)
+      }
       this.openURL()
         .then(() => {
           this.run()
