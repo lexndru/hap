@@ -34,7 +34,7 @@ optional arguments:
 
 #### Get Hap! for Node.js
 ```
-$ npm install hap
+$ npm install hap-js
 $ hap -h
 usage: hap [-h] [-v] [--sample] [--link LINK] [--save] [--verbose]
            [--no-cache] [--refresh] [--silent]
