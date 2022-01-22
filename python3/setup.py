@@ -24,7 +24,7 @@ setup(name="hap",
     },
     test_suite="tests",
     install_requires=[
-        "lxml==3.6.4",
+        "lxml==4.6.5",
         "cssselect==1.0.0",
     ],
     version=__version__,
